@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Register | Hardware Hub</title>
+
+  <!-- Fonts & Icons -->
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+
+  <!-- External CSS -->
+  <link rel="stylesheet" href="register.css" />
+</head>
+<body>
+  <div class="register-container">
+    <div class="register-box">
+      <h1>Create an Account</h1>
+      <p class="subtext">Join Hardware Hub and start shopping!</p>
+
+      <form id="register-form">
+        <label for="fullname">Full Name</label>
+        <input type="text" id="fullname" placeholder="Enter your name" required>
+
+        <label for="email">Email Address</label>
+        <input type="email" id="email" placeholder="Enter your email" required>
+
+        <label for="password">Password</label>
+        <div class="password-container">
+          <input type="password" id="password" placeholder="Create a password" required>
+          <button type="button" class="show-password" id="toggle-password">
+            <i class="fa fa-eye-slash"></i>
+          </button>
+        </div>
+
+        <!-- LUDS8 Password Rule -->
+        <div class="password-hint" id="password-hint">
+          <span id="len" class="invalid">L</span>ength ≥ 8 |
+          <span id="upper" class="invalid">U</span>ppercase |
+          <span id="digit" class="invalid">D</span>igit |
+          <span id="symbol" class="invalid">S</span>ymbol
+        </div>
+
+        <label for="confirm-password">Confirm Password</label>
+        <input type="password" id="confirm-password" placeholder="Confirm your password" required>
+
+        <button type="submit" class="btn-register">Register</button>
+
+        <p class="account-text">
+          Already have an account? <a href="login.html">Login here</a>
+        </p>
+      </form>
+
+      <a href="index.html" class="back-home">← Back to Home</a>
+    </div>
+  </div>
+
+  <script>
+    // === Show / Hide Password with reversed eye icon ===
+    const togglePassword = document.getElementById('toggle-password');
+    const passwordInput = document.getElementById('password');
+    const eyeIcon = togglePassword.querySelector('i');
+
+    togglePassword.addEventListener('click', () => {
+      const isPasswordHidden = passwordInput.getAttribute('type') === 'password';
+      passwordInput.setAttribute('type', isPasswordHidden ? 'text' : 'password');
+      eyeIcon.classList.toggle('fa-eye-slash', !isPasswordHidden);
+      eyeIcon.classList.toggle('fa-eye', isPasswordHidden);
+    });
+
+    // === LUDS8 Password Validation ===
+    const len = document.getElementById('len');
+    const upper = document.getElementById('upper');
+    const digit = document.getElementById('digit');
+    const symbol = document.getElementById('symbol');
+
+    passwordInput.addEventListener('input', () => {
+      const val = passwordInput.value;
+      len.className = val.length >= 8 ? 'valid' : 'invalid';
+      upper.className = /[A-Z]/.test(val) ? 'valid' : 'invalid';
+      digit.className = /\d/.test(val) ? 'valid' : 'invalid';
+      symbol.className = /[!@#$%^&*(),.?":{}|<>]/.test(val) ? 'valid' : 'invalid';
+    });
+
+    // === Register Form Handler with Confirm Password Check ===
+    (function(){
+      const form = document.getElementById('register-form');
+      if(!form) return;
+      form.addEventListener('submit', function(e){
+        e.preventDefault();
+
+        const fullname = document.getElementById('fullname').value.trim();
+        const email = document.getElementById('email').value.trim();
+        const password = document.getElementById('password').value;
+        const confirm = document.getElementById('confirm-password').value;
+
+        // Check password confirmation
+        if (password !== confirm) {
+          alert('❌ Passwords do not match!');
+          return;
+        }
+
+        // Check if password meets LUDS8 rules
+        const validL = password.length >= 8;
+        const validU = /[A-Z]/.test(password);
+        const validD = /\d/.test(password);
+        const validS = /[!@#$%^&*(),.?":{}|<>]/.test(password);
+        if (!(validL && validU && validD && validS)) {
+          alert('⚠️ Password must meet all LUDS8 rules!');
+          return;
+        }
+
+        const firstName = fullname.split(/\s+/)[0] || email.split('@')[0] || 'User';
+        const user = { firstName: firstName, name: fullname, email: email };
+        try { localStorage.setItem('ehw_user', JSON.stringify(user)); } catch(e) {}
+        alert('✅ Registration successful!');
+        window.location.href = 'index.html';
+      });
+    })();
+  </script>
+</body>
+</html>

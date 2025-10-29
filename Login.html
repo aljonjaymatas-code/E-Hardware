@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Login | Hardware Hub</title>
+
+  <!-- Font & Icons -->
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+
+  <!-- External CSS -->
+  <link rel="stylesheet" href="login.css" />
+</head>
+<body>
+  <div class="login-container">
+    <div class="login-box">
+      <h1>Welcome Back!</h1>
+      <p class="subtext">Login to your Hardware Hub account</p>
+
+      <form id="login-form">
+        <label for="email">Email Address</label>
+        <input type="email" id="email" placeholder="Enter your email" required>
+
+        <label for="password">Password</label>
+        <div class="password-container">
+          <input type="password" id="password" placeholder="Enter your password" required>
+          <!-- Eye is now reversed: start hidden -->
+          <button type="button" class="show-password" id="toggle-password">
+            <i class="fa fa-eye-slash"></i>
+          </button>
+        </div>
+
+        
+
+        <button type="submit" class="btn-login">Login</button>
+
+        <p class="account-text">
+          Don’t have an account? <a href="register.html">Register here</a>
+        </p>
+      </form>
+
+      <a href="index.html" class="back-home">← Back to Home</a>
+    </div>
+  </div>
+
+  <script>
+    // === Show / Hide Password with reversed eye icon ===
+    const togglePassword = document.getElementById('toggle-password');
+    const passwordInput = document.getElementById('password');
+    const eyeIcon = togglePassword.querySelector('i');
+
+    togglePassword.addEventListener('click', () => {
+      const isPasswordHidden = passwordInput.getAttribute('type') === 'password';
+      passwordInput.setAttribute('type', isPasswordHidden ? 'text' : 'password');
+      // reversed logic
+      eyeIcon.classList.toggle('fa-eye-slash', !isPasswordHidden);
+      eyeIcon.classList.toggle('fa-eye', isPasswordHidden);
+    });
+
+    
+
+    // === Simulate Login and Redirect ===
+    (function(){
+      const form = document.getElementById('login-form');
+      if(!form) return;
+      form.addEventListener('submit', function(e){
+        e.preventDefault();
+        const email = (document.getElementById('email')||{}).value || '';
+        const firstName = (email.split('@')[0] || 'User').split(/[\.\-_]/)[0];
+        const user = { firstName: firstName, name: firstName, email };
+        try{ localStorage.setItem('ehw_user', JSON.stringify(user)); }catch(e){}
+        window.location.href = 'index.html';
+      });
+    })();
+  </script>
+</body>
+</html>

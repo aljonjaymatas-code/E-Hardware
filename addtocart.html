@@ -1,0 +1,318 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Your Cart</title>
+  <style>
+
+    :root{--accent-start:#ff7a17;--accent-end:#ffb03b;--bg-dark:#2b0f0f;--itemscolor:#3a1414;--text-light:#fff9f6}
+    body{font-family:Segoe UI, Tahoma, Geneva, Verdana, sans-serif;margin:0;padding:28px;background:var(--bg-dark);color:var(--text-light)}
+    .container{max-width:1200px;margin:0 auto}
+    h1{margin:0 0 18px;color:var(--text-light)}
+    .cart-layout{display:grid;grid-template-columns:1fr 340px;gap:26px}
+    .cart-list{background:var(--itemscolor);padding:20px;border-radius:8px}
+    .cart-item{display:flex;align-items:flex-start;gap:16px;padding:16px;border-bottom:1px solid rgba(255,255,255,0.04)}
+    .cart-item:last-child{border-bottom:none}
+    .cart-item img{width:84px;height:84px;object-fit:cover;border-radius:8px;flex-shrink:0}
+    .item-meta{flex:1;display:flex;flex-direction:column;min-width:0}
+    .item-meta h4{margin:0 0 6px;color:var(--text-light);font-size:1.05rem}
+    .item-meta .price{color:var(--accent-end);font-weight:700}
+    .qty-controls{display:flex;align-items:center;gap:10px;margin-top:10px}
+    .qty-controls button{width:36px;height:36px;border-radius:8px;border:none;background:#fff;color:var(--bg-dark);font-weight:800;cursor:pointer;display:inline-flex;align-items:center;justify-content:center}
+  .qty-controls .count{min-width:36px;min-height:36px;display:inline-flex;align-items:center;justify-content:center;font-weight:800}
+  /* remove button displayed as a white rounded pill with dark text (matches screenshot) */
+  .remove{background:#fff;color:var(--bg-dark);padding:8px 50px;border-radius:10px;display:inline-flex;align-items:center;justify-content:center;box-shadow:0 6px 12px rgba(0,0,0,0.12);border:none;font-weight:700;cursor:pointer;margin-left:12px;transition:background 180ms ease,color 180ms ease,transform 140ms ease}
+  /* make sure remove doesn't shrink and pushes to right if space allows */
+  .qty-controls .remove{flex-shrink:0}
+  /* destructive hover/focus */
+  .remove:hover, .remove:focus { background: #e53935; color: #fff; transform: translateY(-2px); outline: none; }
+  .remove:focus { box-shadow: 0 0 0 4px rgba(229,57,53,0.14); }
+  /* Continue shopping as accent-outlined pill */
+  .continue-btn{display:inline-block;padding:10px 14px;border-radius:10px;background:transparent;border:2px solid rgba(255,255,255,0.08);color:var(--text-light);font-weight:700;text-decoration:none}
+    .summary{background:#fff;color:var(--bg-dark);padding:18px;border-radius:8px}
+    .summary h3{margin-top:0}
+    .summary .row{display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid rgba(0,0,0,0.04)}
+    .summary .row.total{font-weight:800;font-size:1.1rem}
+  .actions{display:flex;gap:12px;margin-top:14px}
+  .btn-primary{background:linear-gradient(90deg,var(--accent-start),var(--accent-end));color:var(--bg-dark);padding:10px 14px;border-radius:8px;border:none;cursor:pointer;font-weight:800}
+  .btn-ghost{background:transparent;border:1px solid rgba(0,0,0,0.08);padding:10px 14px;border-radius:8px;cursor:pointer;color:var(--bg-dark)}
+  /* Clear Cart hover: transition to red */
+  #clear-cart{transition:background 220ms ease,color 220ms ease,border-color 220ms ease}
+  #clear-cart:hover{background:#e53935;color:#fff;border-color:transparent}
+    .empty{padding:24px;background:var(--itemscolor);border-radius:8px;color:#e6e6e6}
+
+  @media (max-width:900px){.cart-layout{grid-template-columns:1fr}.summary{order:2}.cart-item{flex-direction:row}.qty-controls{gap:8px}}
+  @media (max-width:520px){.cart-item{flex-direction:column;align-items:flex-start}.qty-controls{margin-top:12px}}
+
+
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Your Cart</h1>
+    <div class="cart-layout">
+      <div id="cart-root" class="cart-list"></div>
+      <aside class="summary" id="cart-summary">
+        <h3>Order Summary</h3>
+        <div style="margin:8px 0 12px;">
+          <label style="font-weight:700;color:#222;display:inline-flex;align-items:center;gap:8px"><input type="checkbox" id="select-all"> Select all</label>
+        </div>
+        <div class="row"><span>Items</span><span id="summary-items"></span></div>
+        <div class="row"><span>Subtotal</span><span id="summary-sub"></span></div>
+        <div class="row"><span>Shipping</span><span id="summary-ship"></span></div>
+        <div class="row total"><span>Total</span><span id="summary-total"></span></div>
+        <div class="actions"><button id="checkout" class="btn-primary">Checkout</button><button id="clear-cart" class="btn-ghost">Clear Cart</button></div>
+      </aside>
+    </div>
+  <div style="margin-top:18px"><a href="index.html#Product" class="continue-btn">Continue shopping</a></div>
+  </div>
+
+  <script>
+    (function(){
+      const STORAGE_KEY = 'ehw_cart_v1';
+      const UPDATE_KEY = 'ehw_cart_v1_last_update';
+      function readCart(){ try{ return JSON.parse(localStorage.getItem(STORAGE_KEY)) || {}; }catch(e){ return {}; } }
+      function writeCart(c){
+        try{
+          // Preserve items even if qty is 0, but clamp negative quantities to 0
+          const cleanCart = {};
+          Object.keys(c).forEach(key => {
+            const item = c[key];
+            if (!item) return;
+            // normalize qty to a non-negative integer
+            let qty = Number(item.qty) || 0;
+            if (qty < 0) qty = 0;
+            item.qty = qty;
+            // keep the item in storage even if qty is 0 (user requested)
+            cleanCart[key] = item;
+          });
+
+          localStorage.setItem(STORAGE_KEY, JSON.stringify(cleanCart));
+          localStorage.setItem(UPDATE_KEY, Date.now());
+
+          // Dispatch storage event for cross-tab sync
+          window.dispatchEvent(new StorageEvent('storage', {
+            key: STORAGE_KEY,
+            newValue: JSON.stringify(cleanCart)
+          }));
+
+          // Update cart indicator if it exists
+          updateCartIndicator();
+        }catch(e){
+          console.warn('Failed to write cart:', e);
+        }
+      }
+
+      // Update cart indicator in header
+      function updateCartIndicator() {
+        const cart = readCart();
+        // Only count items with qty > 0
+        const itemCount = Object.values(cart)
+          .filter(item => item && item.qty > 0)
+          .reduce((sum, item) => sum + item.qty, 0);
+        const indicator = document.querySelector('.cart-indicator');
+        if (indicator) {
+          if (itemCount > 0) {
+            indicator.textContent = itemCount;
+            indicator.style.display = 'flex';
+          } else {
+            indicator.textContent = '';
+            indicator.style.display = 'none';
+          }
+        }
+      }
+
+      const root = document.getElementById('cart-root');
+      const summaryItems = document.getElementById('summary-items');
+      const summarySub = document.getElementById('summary-sub');
+      const summaryShip = document.getElementById('summary-ship');
+      const summaryTotal = document.getElementById('summary-total');
+
+      function money(n){ return '₱' + (Number(n)||0).toLocaleString(); }
+
+      function calcTotals(cart){
+        // Filter out invalid items and items with 0 quantity
+        const items = Object.values(cart).filter(i => i && typeof i.price === 'number' && i.qty > 0);
+        const itemCount = items.reduce((s,i)=>s + i.qty, 0);
+        const subtotal = items.reduce((s,i)=>s + (i.price * i.qty), 0);
+        const shipping = itemCount ? 120 : 0; // flat shipping for example
+        const total = subtotal + shipping;
+        return { itemCount, subtotal, shipping, total };
+      }
+
+      function render(){
+        const cart = readCart();
+        const keys = Object.keys(cart);
+        if(keys.length === 0){
+          root.innerHTML = '<div class="empty">Your cart is empty.</div>';
+          summaryItems.textContent = '0'; summarySub.textContent = '₱0'; summaryShip.textContent = '₱0'; summaryTotal.textContent = '₱0';
+          return;
+        }
+
+        const frag = document.createDocumentFragment();
+
+        // Sort keys to ensure consistent display order
+        keys.sort().forEach(k => {
+          const it = cart[k];
+          if (!it || typeof it.price !== 'number') return; // skip invalid items
+
+          const div = document.createElement('div');
+          const displayPrice = '₱' + it.price.toLocaleString(); // Format stored numeric price
+          const itemTotal = it.price * (it.qty || 1);           // Compute subtotal per item
+
+  div.className = 'cart-item';
+  div.innerHTML = `
+    <label style="display:flex;align-items:flex-start;gap:12px">
+      <input type="checkbox" class="sel" data-id="${k}" ${it.selected ? 'checked' : ''} style="margin-top:8px">
+    </label>
+    <img src="${it.image || 'image/e12.webp'}" alt="${it.name}">
+    <div class="item-meta">
+      <h4>${it.name}</h4>
+      <div class="price">Price: ${displayPrice}</div>
+      <div class="price">Subtotal: ₱${itemTotal.toLocaleString()}</div>
+      <div class="qty-controls">
+        <button class="dec" data-id="${k}">-</button>
+        <div class="count">${it.qty}</div>
+        <button class="inc" data-id="${k}">+</button>
+        <button class="remove" data-id="${k}">Remove</button>
+      </div>
+    </div>
+  `;
+
+  frag.appendChild(div);
+});
+
+        root.innerHTML = '';
+        root.appendChild(frag);
+
+        // handlers
+        root.querySelectorAll('button.remove').forEach(btn=> btn.addEventListener('click', function(){
+          const id = this.getAttribute('data-id');
+          const cart = readCart();
+          delete cart[id];
+          writeCart(cart);
+          render();
+          updateCartIndicator(); // Update indicator after removal
+        }));
+
+        // checkbox handlers for selecting items
+        root.querySelectorAll('input.sel').forEach(cb => cb.addEventListener('change', function(){
+          const id = this.getAttribute('data-id');
+          const cart = readCart(); if(!cart[id]) return;
+          cart[id].selected = this.checked;
+          writeCart(cart);
+          render(); // re-render to update select-all state and counts
+        }));
+
+        // select-all checkbox
+        const selectAllEl = document.getElementById('select-all');
+        if(selectAllEl){
+          // set checked state based on whether all qty>0 items are selected
+          const cartForCheck = readCart();
+          const keysForCheck = Object.keys(cartForCheck).filter(k => cartForCheck[k] && (cartForCheck[k].qty || 0) > 0);
+          const allSelected = keysForCheck.length && keysForCheck.every(k => cartForCheck[k].selected);
+          selectAllEl.checked = !!allSelected;
+          selectAllEl.addEventListener('change', function(){
+            const cart = readCart();
+            Object.keys(cart).forEach(k => {
+              if(!cart[k]) return;
+              // only set selected for items that have qty > 0
+              if((cart[k].qty || 0) > 0) cart[k].selected = selectAllEl.checked;
+            });
+            writeCart(cart);
+            render();
+          });
+        }
+
+        root.querySelectorAll('button.inc').forEach(btn=> btn.addEventListener('click', function(){
+          const id = this.getAttribute('data-id');
+          const cart = readCart();
+          if(!cart[id]) return;
+          cart[id].qty = (cart[id].qty||0) + 1;
+          writeCart(cart);
+          render();
+          updateCartIndicator(); // Update indicator after increment
+        }));
+
+        root.querySelectorAll('button.dec').forEach(btn=> btn.addEventListener('click', function(){
+          const id = this.getAttribute('data-id');
+          const cart = readCart();
+          if(!cart[id]) return;
+          // Decrement quantity but do NOT remove the item when it reaches 0.
+          cart[id].qty = Math.max(0, (Number(cart[id].qty) || 0) - 1);
+          writeCart(cart);
+          render();
+          updateCartIndicator();
+        }));
+
+        // update summary
+        const t = calcTotals(cart);
+        summaryItems.textContent = t.itemCount;
+        summarySub.textContent = money(t.subtotal);
+        summaryShip.textContent = money(t.shipping);
+        summaryTotal.textContent = money(t.total);
+      }
+
+      document.getElementById('clear-cart').addEventListener('click', function(){
+        if(!confirm('Clear all items from the cart?')) return;
+        writeCart({});
+        render();
+        updateCartIndicator(); // Update indicator after clearing cart
+      });
+
+      document.getElementById('checkout').addEventListener('click', function(){
+        const cart = readCart();
+        const keys = Object.keys(cart).filter(k => cart[k]);
+        if(!keys.length){ alert('Your cart is empty'); return; }
+
+        // Determine which items to checkout: selected items, otherwise all items with qty>0
+        let selectedKeys = keys.filter(k => cart[k].selected && (cart[k].qty || 0) > 0);
+        if(!selectedKeys.length){
+          selectedKeys = keys.filter(k => (cart[k].qty || 0) > 0);
+        }
+
+        if(!selectedKeys.length){
+          alert('No items selected to checkout. Please select items or increase quantities.');
+          return;
+        }
+
+        // compute totals for selected items
+        const selectedItems = selectedKeys.map(k => cart[k]);
+        const subtotal = selectedItems.reduce((s,i) => s + ((Number(i.price) || 0) * (Number(i.qty) || 0)), 0);
+        const shipping = subtotal ? 120 : 0;
+        const total = subtotal + shipping;
+
+        // demo: show a confirmation and (for now) clear selected items or reduce quantities as 'purchased'
+        const names = selectedItems.map(i => `${i.name} (x${i.qty})`).join('\n');
+        if(!confirm(`Proceed to checkout for:\n\n${names}\n\nSubtotal: ₱${subtotal.toLocaleString()}\nShipping: ₱${shipping}\nTotal: ₱${total.toLocaleString()}\n\nClick OK to simulate purchase.`)) return;
+
+        // Simulate purchase: for demo we'll set purchased items' qty to 0 but keep them in cart (user requested)
+        selectedKeys.forEach(k => {
+          if(cart[k]) cart[k].qty = 0;
+        });
+        writeCart(cart);
+        render();
+        updateCartIndicator();
+        alert('Purchase simulated. Thank you!');
+      });
+
+      // Listen for storage changes from other tabs
+      window.addEventListener('storage', function(e) {
+        if (e.key === STORAGE_KEY) {
+          render();
+          updateCartIndicator();
+        }
+      });
+
+      // Clean up any invalid cart data on page load
+      const initialCart = readCart();
+      writeCart(initialCart); // This will clean out any invalid items
+
+      // initial render and indicator update
+      render();
+      updateCartIndicator();
+    })();
+  </script>
+</body>
+</html>

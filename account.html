@@ -1,0 +1,304 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Account | E-Hardware</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    <link rel="stylesheet" href="account.css">
+    <script src="account.js" defer></script>
+</head>
+<body>
+    <header class="header">
+  <nav class="navbar">
+    <div class="left-aligned-group">
+      <div class="logo">
+        <img src="image/logo2.png" alt="E-hardware logo">
+        <h1>E-hardware</h1>
+      </div>
+
+      <ul class="nav-links">
+        <li><a href="#home">Home</a></li>
+        <li><a href="#Product">Products</a></li>
+        <li><a href="#about">About</a></li>
+        <li><a href="#Services">Services</a></li>
+        <li><a href="#contact">Contact</a></li>
+        <!-- 🌿 Search bar centered -->
+
+
+      <div class="search-bar-wrapper">
+            <div class="search-bar">
+            <i class="fa fa-search"></i>
+            <input type="text" placeholder="Search products..." />
+
+           <a href="addtocart.html" class="cart-container" id="cart-link" aria-label="View cart">
+              <i class="fa fa-shopping-cart cart-icon"></i>
+             <div class="cart-indicator hidden" id="cart-indicator"></div>
+           </a>
+         </div>
+        </div>
+      </ul>
+    </div>
+
+
+
+    <div class="spacer"></div>
+
+    <!-- Login/Register / User menu -->
+    <div class="auth-buttons">
+      <!-- simple links for guests -->
+      <a href="Login.html" class="login-btn" id="login-text">Login</a>
+      <a href="Register.html" class="register-btn" id="register-link">Register</a>
+
+      <!-- dropdown for logged-in users (hidden for guests) -->
+      <div id="user-menu" class="user-menu" aria-haspopup="true" aria-label="User menu" style="display:none;">
+        <button id="user-toggle" class="user-toggle" aria-expanded="false" aria-controls="user-dropdown">
+          <i class="fa fa-user user-avatar" aria-hidden="true"></i>
+          <span class="user-name">hi</span>
+          <i class="fa fa-caret-down" aria-hidden="true"></i>
+        </button>
+        <div id="user-dropdown" class="user-dropdown" role="menu" aria-hidden="true">
+          <a href="account.html" id="menu-profile" class="menu-item" role="menuitem" tabindex="-1"><strong>My Account</strong></a>
+          <a href="addtocart.html" id="menu-purchase" class="menu-item" role="menuitem" tabindex="-1"><strong>My Purchase</strong></a>
+          <a href="#" id="menu-logout" class="menu-item" role="menuitem" tabindex="-1"><strong>Logout</strong></a>
+        </div>
+      </div>
+    </div>
+  </nav>
+</header>
+
+    <div class="account-container">
+        <aside class="sidebar">
+            <div class="user-info">
+                <div class="user-avatar" aria-label="User Avatar">
+                    <i class="fa fa-user-circle-o" aria-hidden="true" style="font-size: 50px;"></i>
+                </div>
+                <div class="user-name">russellafable326</div>
+            </div>
+
+            <ul class="menu" role="menu">
+                <li class="accordion-item" role="none">
+                    <button class="menu-btn accordion-header active" data-target="account-submenu" aria-expanded="true" aria-controls="account-submenu" role="menuitem">
+                        <i class="fa fa-user-circle-o" aria-hidden="true"></i> My Account
+                    </button>
+                    <ul id="account-submenu" class="submenu expanded" role="group">
+                        <li role="none"><button class="submenu-btn active" data-section="profile-section" role="menuitem">Profile</button></li>
+                        <li role="none"><button class="submenu-btn" data-section="banks-cards-section" role="menuitem">Banks & Cards</button></li>
+                        <li role="none"><button class="submenu-btn" data-section="addresses-section" role="menuitem">Addresses</button></li>
+                        <!-- Removed Change Password, Privacy Settings, Notification Settings per request -->
+                    </ul>
+                </li>
+                <li role="none"><button class="menu-btn" data-section="purchase-section" role="menuitem"><i class="fa fa-archive" aria-hidden="true"></i> My Purchase</button></li>
+                <li role="none"><button class="menu-btn" data-section="notif-section" role="menuitem"><i class="fa fa-bell-o" aria-hidden="true"></i> Notifications</button></li>
+                <!-- Removed My Vouchers and My E-Coins menu items per request -->
+            </ul>
+        </aside>
+
+        <main class="main-content">
+            <section id="profile-section" class="content-section active" role="region" aria-labelledby="profile-heading">
+                <h1 id="profile-heading">My Profile</h1>
+                <p class="section-subtitle">Manage and protect your account</p>
+
+                <form class="profile-form-layout">
+                    <div class="profile-main-content">
+                        <div class="form-fields">
+                            <div class="form-group">
+                                <label for="username">Username</label>
+                                <div class="input-with-note">
+                                    <div class="static-value">russellafable326</div>
+                                    <small>Username can only be changed once.</small>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label for="name">Name</label>
+                                <input type="text" id="name" value="Russell">
+                            </div>
+                            <div class="form-group">
+                                <label>Email</label>
+                                <div class="static-value editable">Add</div>
+                            </div>
+                            <div class="form-group">
+                                <label>Phone Number</label>
+                                <div class="static-value editable">Add</div>
+                            </div>
+                            <div class="form-group radio-group">
+                                <label>Gender</label>
+                                <div class="radio-options">
+                                    <input type="radio" id="male" name="gender" value="male">
+                                    <label for="male">Male</label>
+                                    <input type="radio" id="female" name="gender" value="female" checked>
+                                    <label for="female">Female</label>
+                                    <input type="radio" id="other" name="gender" value="other">
+                                    <label for="other">Other</label>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label>Date of birth</label>
+                                <div class="static-value">
+                                    **/**/**2000 <a href="#" class="change-link">Change</a>
+                                </div>
+                            </div>
+                        </div>
+
+
+
+                        <div class="profile-image-upload">
+                            <div class="image-placeholder" aria-hidden="true"><i class="fa fa-user-circle-o" aria-hidden="true"></i></div>
+                            <button type="button" class="select-image-btn">Select Image</button>
+                            <small>File size: maximum 1 MB</small>
+                            <small>File extension: .JPEG, .PNG</small>
+                        </div>
+                    </div>
+                </form>
+
+                <div class="save-button-column">
+                        <button type="submit" class="save-btn-large">Save</button>
+                       </div>
+
+
+            </section>
+
+            <section id="addresses-section" class="content-section" role="region" aria-labelledby="addresses-heading">
+                <div class="addresses-header">
+                    <h1 id="addresses-heading">My Addresses</h1>
+                    <button class="add-address-btn" id="open-address-modal" aria-controls="address-modal"><i class="fa fa-plus-circle" aria-hidden="true"></i> Add New Address</button>
+                </div>
+                <div class="addresses-list-container">
+                    <div class="no-addresses">
+                        <div class="map-icon" aria-hidden="true"><i class="fa fa-map-marker"></i></div>
+                        <p>You don't have addresses yet.</p>
+                    </div>
+                </div>
+            </section>
+
+            <section id="banks-cards-section" class="content-section" role="region"><h1>Banks & Cards</h1><p>Content for Banks & Cards.</p></section>
+
+            <section id="purchase-section" class="content-section" role="region" aria-labelledby="purchase-heading">
+                <h1 id="purchase-heading">My Purchase</h1>
+                <div class="purchase-tabs" role="tablist">
+                    <button class="tab active" role="tab" aria-selected="true" aria-controls="tab-all">All</button>
+                    <button class="tab" role="tab" aria-selected="false" aria-controls="tab-to-pay">To Pay</button>
+                    <button class="tab" role="tab" aria-selected="false" aria-controls="tab-to-ship">To Ship</button>
+                    <button class="tab" role="tab" aria-selected="false" aria-controls="tab-to-receive">To Receive</button>
+                    <button class="tab" role="tab" aria-selected="false" aria-controls="tab-completed">Completed</button>
+                    <button class="tab" role="tab" aria-selected="false" aria-controls="tab-cancelled">Cancelled</button>
+                    <button class="tab" role="tab" aria-selected="false" aria-controls="tab-return-refund">Return Refund</button>
+                </div>
+                <div class="purchase-search">
+                    <input type="text" placeholder="You can search by Seller Name, Order ID or Product name" aria-label="Search Orders">
+                </div>
+                <div class="no-orders">
+                    <img src="image/noorder.png" alt="No Orders Found">
+                    <p>No orders yet</p>
+                </div>
+            </section>
+
+            <section id="notif-section" class="content-section" role="region"><h1>Notifications</h1><p>No notifications yet.</p></section>
+        </main>
+    </div>
+
+    <div id="address-modal" class="modal" role="dialog" aria-modal="true" aria-labelledby="modal-heading">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 id="modal-heading">New Address</h2>
+                <span class="close-btn" aria-label="Close modal">&times;</span>
+            </div>
+            <div class="modal-body">
+                <form id="new-address-form">
+                    <div class="form-row-modal">
+                        <div class="form-group-modal half-width">
+                            <label for="modal-fullname" class="sr-only">Full Name</label>
+                            <input type="text" id="modal-fullname" placeholder="Full Name" value="russellafable" required class="input-filled">
+                        </div>
+                        <div class="form-group-modal half-width">
+                            <label for="modal-phone" class="sr-only">Phone Number</label>
+                            <input type="text" id="modal-phone" placeholder="Phone Number" value="(+63) 957 453 5234" required class="input-filled">
+                        </div>
+                    </div>
+
+                    <div class="form-group-modal">
+                        <label for="modal-region-province" class="sr-only">Region, Province, City, Barangay</label>
+                        <div class="location-dropdown-container" id="location-dropdown-toggle" role="combobox" aria-haspopup="listbox" aria-expanded="false">
+                            <input type="text" id="modal-region-province" placeholder="Region, Province, City, Barangay" value="Mindanao / Davao Del Norte" readonly class="input-dropdown input-filled">
+                            <i class="fa fa-caret-down dropdown-arrow" aria-hidden="true"></i>
+
+                            <div class="location-picker-content" id="location-picker-content" role="listbox">
+                                <div class="location-tabs">
+                                    <button type="button" class="location-tab active" data-tab="region">Region</button>
+                                    <button type="button" class="location-tab" data-tab="province">Province</button>
+                                    <button type="button" class="location-tab" data-tab="city">City</button>
+                                    <button type="button" class="location-tab" data-tab="barangay">Barangay</button>
+                                </div>
+                                <div class="location-list-wrapper">
+
+                                    <ul class="location-list active" id="location-region-list" data-list="region" role="presentation">
+                                        <li class="location-item" role="option">Mindanao</li>
+                                        <li class="location-item" role="option">Metro Manila</li>
+                                        <li class="location-item" role="option">North Luzon</li>
+                                        <li class="location-item" role="option">South Luzon</li>
+                                        <li class="location-item" role="option">Visayas</li>
+                                    </ul>
+
+                                    <ul class="location-list" id="location-province-list" data-list="province" role="presentation">
+                                        <li class="location-item" role="option">Davao Del Norte</li>
+                                        <li class="location-item" role="option">Davao Del Sur</li>
+                                        <li class="location-item" role="option">Davao Occidental</li>
+                                    </ul>
+
+                                    <ul class="location-list" id="location-city-list" data-list="city" role="presentation">
+                                        <li class="location-item" role="option">Tagum City</li>
+                                        <li class="location-item" role="option">Panabo City</li>
+                                        <li class="location-item" role="option">Samal City</li>
+                                        <li class="location-item-empty">Select a Province first.</li>
+                                    </ul>
+
+                                    <ul class="location-list" id="location-barangay-list" data-list="barangay" role="presentation">
+                                        <li class="location-item" role="option">Magugpo North</li>
+                                        <li class="location-item" role="option">Magugpo South</li>
+                                        <li class="location-item" role="option">New Balamban</li>
+                                        <li class="location-item-empty">Select a City first.</li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-group-modal">
+                        <label for="modal-postal-code" class="sr-only">Postal Code</label>
+                        <input type="text" id="modal-postal-code" placeholder="Postal Code" value="8101" required class="input-highlight">
+                    </div>
+
+                    <div class="form-group-modal">
+                        <label for="modal-street-address" class="sr-only">Street Name, Building, House No.</label>
+                        <input type="text" id="modal-street-address" placeholder="Street Name, Building, House No.">
+                    </div>
+
+                    <div class="form-group-modal map-placeholder">
+                        <button type="button" class="add-location-btn">
+                            <i class="fa fa-plus" aria-hidden="true"></i> Add Location
+                        </button>
+                    </div>
+
+                    <div class="form-group-modal label-for-group">
+                        <label>Label for</label>
+                        <div class="label-radio-options">
+                            <button type="button" class="label-btn active">Home</button>
+                            <button type="button" class="label-btn">Work</button>
+                        </div>
+                    </div>
+
+                    <div class="form-group-modal checkbox-group">
+                        <input type="checkbox" id="default-address">
+                        <label for="default-address">Set as Default Address</label>
+                    </div>
+
+                    <div class="modal-footer no-border-top">
+                        <button type="button" class="cancel-btn close-btn">Cancel</button>
+                        <button type="submit" class="submit-btn">Submit</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

@@ -1,0 +1,1663 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Document</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+  <link rel="stylesheet" href="index.css">
+</head>
+<body>
+
+  <header class="header">
+  <nav class="navbar">
+    <div class="left-aligned-group">
+      <div class="logo">
+        <img src="image/logo2.png" alt="E-hardware logo">
+        <h1>E-hardware</h1>
+      </div>
+
+      <ul class="nav-links">
+        <li><a href="#home">Home</a></li>
+        <li><a href="#Product">Products</a></li>
+        <li><a href="#about">About</a></li>
+        <li><a href="#Services">Services</a></li>
+        <li><a href="#contact">Contact</a></li>
+        <!-- 🌿 Search bar centered -->
+
+
+      <div class="search-bar-wrapper">
+            <div class="search-bar">
+            <i class="fa fa-search"></i>
+            <input type="text" placeholder="Search products..." />
+
+           <a href="addtocart.html" class="cart-container" id="cart-link" aria-label="View cart">
+              <i class="fa fa-shopping-cart cart-icon"></i>
+             <div class="cart-indicator hidden" id="cart-indicator"></div>
+           </a>
+         </div>
+        </div>
+      </ul>
+    </div>
+
+
+
+    <div class="spacer"></div>
+
+    <!-- Login/Register / User menu -->
+    <div class="auth-buttons">
+      <!-- simple links for guests -->
+      <a href="Login.html" class="login-btn" id="login-text">Login</a>
+      <a href="Register.html" class="register-btn" id="register-link">Register</a>
+
+      <!-- dropdown for logged-in users (hidden for guests) -->
+      <div id="user-menu" class="user-menu" aria-haspopup="true" aria-label="User menu" style="display:none;">
+        <button id="user-toggle" class="user-toggle" aria-expanded="false" aria-controls="user-dropdown">
+          <i class="fa fa-user user-avatar" aria-hidden="true"></i>
+          <span class="user-name">hi</span>
+          <i class="fa fa-caret-down" aria-hidden="true"></i>
+        </button>
+        <div id="user-dropdown" class="user-dropdown" role="menu" aria-hidden="true">
+          <a href="account.html" id="menu-profile" class="menu-item" role="menuitem" tabindex="-1"><strong>My Account</strong></a>
+          <a href="addtocart.html" id="menu-purchase" class="menu-item" role="menuitem" tabindex="-1"><strong>My Purchase</strong></a>
+          <a href="#" id="menu-logout" class="menu-item" role="menuitem" tabindex="-1"><strong>Logout</strong></a>
+        </div>
+      </div>
+    </div>
+  </nav>
+</header>
+
+
+
+<!-- Homepage Tagline and Image -->
+<section id="home" class="hero">
+  <div class="hero-left">
+    <h1>
+      <span class="highlight">Smash Doms,</span>
+      <span class="subtext">Master Your Crafts Only at E-Hardware</span>
+    </h1>
+    <p class="tagline">
+      Discover the Ultimate Tools for Every Project and Elevate Your Craft with
+      Smash Doms, Precision Quality, and Reliable Only at E-Hardware.
+    </p>
+    <a href="#Product" class="btn-primary">Browse Products</a>
+  </div>
+
+  <div class="hero-right">
+    <img src="image/front.png" alt="Hardware Tools" class="hero-image">
+  </div>
+</section>
+
+
+
+<!-- Product Section -->
+<section class="product-section" id="Product">
+  <h1>Our Products</h1>
+
+  <!-- Sort and Navigation Bar -->
+  <div class="product-toolbar">
+    <div class="sort-options">
+      <label for="sort">Sort by:</label>
+      <select id="sort" name="sort">
+        <option value="All">        All Categories  </option>
+        <option value="Hand">       Hand Tools      </option>
+        <option value="Power">      Power Tools     </option>
+        <option value="Painting">   Painting Tools  </option>
+        <option value="Fastening">  Fastening Tools </option>
+        <option value="Bolts">      Bolts           </option>
+      </select>
+
+      <!-- Price sort (High -> Low / Low -> High) -->
+      <label for="price-sort" style="margin-left:12px">Price:</label>
+      <select id="price-sort" name="price-sort">
+        <option value="none">Default</option>
+        <option value="high-to-low">High → Low</option>
+        <option value="low-to-high">Low → High</option>
+      </select>
+    </div>
+
+    <div class="pagination-buttons">
+      <button class="prev-btn">◀ Previous </button>
+      <button class="next-btn">Next ▶     </button>
+    </div>
+  </div>
+
+
+
+
+
+
+
+
+  <!-- ✅ PAGE 1 (first 20 products) -->
+
+
+  <div class="product-page page-1" id="page-1" data-category="Hand">
+    <div class="product-grid">
+
+      <!-- 1 -->
+      <div class="product-card">
+        <img src="hand-tools/hammer.jpg" alt="Hammer">
+        <h3>Hammer</h3>
+        <p class="details">Used for driving nails, fitting parts, and breaking objects apart.</p>
+        <div class="btn-group">
+          <button class="add-cart" onclick="addToCart(1)">Add to Cart</button>
+          <button class="view-details" onclick="viewProduct(1)">View Details</button>
+          <button class="buy-now">Buy Now</button>
+        </div>
+      </div>
+
+      <!-- 2 -->
+      <div class="product-card">
+        <img src="hand-tools/flat.jpg" alt="Flat Screwdriver">
+        <h3>Flat Screwdriver</h3>
+        <p class="details">Has a flat tip; used for turning screws with a straight, slotted head.</p>
+        <div class="btn-group">
+          <button class="add-cart" onclick="addToCart(2)">Add to Cart</button>
+          <button class="view-details" onclick="viewProduct(2)">View Details</button>
+          <button class="buy-now">Buy Now</button>
+        </div>
+      </div>
+
+      <!-- 3 -->
+      <div class="product-card">
+        <img src="hand-tools/star.jpg" alt="Star Screwdriver">
+        <h3>Star Screwdriver</h3>
+        <p class="details">Features a cross-shaped tip; fits screws with a cross slot.</p>
+        <div class="btn-group">
+          <button class="add-cart" onclick="addToCart(3)">Add to Cart</button>
+          <button class="view-details" onclick="viewProduct(3)">View Details</button>
+          <button class="buy-now">Buy Now</button>
+        </div>
+      </div>
+
+      <!-- 4 -->
+      <div class="product-card">
+        <img src="hand-tools/adjustatble.jpg" alt="Adjustable Wrench">
+        <h3>Adjustable Wrench</h3>
+        <p class="details">A versatile wrench with a movable jaw for gripping different bolt sizes.</p>
+        <div class="btn-group">
+          <button class="add-cart" onclick="addToCart(4)">Add to Cart</button>
+          <button class="view-details" onclick="viewProduct(4)">View Details</button>
+          <button class="buy-now">Buy Now</button>
+        </div>
+      </div>
+
+      <!-- 5 -->
+      <div class="product-card">
+        <img src="hand-tools/Pliers.webp" alt="Pliers">
+        <h3>Pliers</h3>
+        <p class="details">Used for gripping, bending, or cutting wires and other materials.</p>
+        <div class="btn-group">
+          <button class="add-cart" onclick="addToCart(5)">Add to Cart</button>
+          <button class="view-details" onclick="viewProduct(5)">View Details</button>
+          <button class="buy-now">Buy Now</button>
+        </div>
+      </div>
+
+      <!-- 6 -->
+      <div class="product-card">
+        <img src="hand-tools/Measuring Tape.jpg" alt="Measuring Tape">
+        <h3>Measuring Tape</h3>
+        <p class="details">A retractable ruler used for measuring length, width, or height of objects.</p>
+        <div class="btn-group">
+          <button class="add-cart" onclick="addToCart(6)">Add to Cart</button>
+          <button class="view-details" onclick="viewProduct(6)">View Details</button>
+          <button class="buy-now">Buy Now</button>
+        </div>
+      </div>
+
+      <!-- 7 -->
+      <div class="product-card">
+        <img src="hand-tools/Utility Knife.jpg" alt="Utility Knife">
+        <h3>Utility Knife</h3>
+        <p class="details">A sharp, retractable blade used for cutting materials like cardboard or plastic.</p>
+        <div class="btn-group">
+          <button class="add-cart">Add to Cart</button>
+          <button class="view-details" onclick="viewProduct(7)">View Details</button>
+          <button class="buy-now">Buy Now</button>
+        </div>
+      </div>
+
+      <!-- 8 -->
+      <div class="product-card">
+        <img src="hand-tools/Spirit Level.jpg" alt="Spirit Level">
+        <h3>Spirit Level</h3>
+        <p class="details">Used to check if surfaces are level (horizontal) or plumb (vertical).</p>
+        <div class="btn-group">
+          <button class="add-cart">Add to Cart</button>
+          <button class="view-details" onclick="viewProduct(8)">View Details</button>
+          <button class="buy-now">Buy Now</button>
+        </div>
+      </div>
+
+      <!-- 9 -->
+      <div class="product-card">
+        <img src="hand-tools/Chisel.jpg" alt="Chisel">
+        <h3>Chisel</h3>
+        <p class="details">A sharp-edged hand tool used for carving or cutting hard materials like wood or metal.</p>
+        <div class="btn-group">
+          <button class="add-cart">Add to Cart</button>
+          <button class="view-details" onclick="viewProduct(9)">View Details</button>
+          <button class="buy-now">Buy Now</button>
+        </div>
+      </div>
+
+      <!-- 10 -->
+      <div class="product-card">
+        <img src="hand-tools/Allen Key(Hex Key).jpg" alt="Allen Key (Hex Key)">
+        <h3>Allen Key (Hex Key)</h3>
+        <p class="details">A small L-shaped tool used to drive bolts and screws with hexagonal sockets.</p>
+        <div class="btn-group">
+          <button class="add-cart">Add to Cart</button>
+          <button class="view-details" onclick="viewProduct(10)">View Details</button>
+          <button class="buy-now">Buy Now</button>
+        </div>
+      </div>
+
+      <!-- 11 -->
+      <div class="product-card">
+        <img src="hand-tools/Hand Saw.jpg" alt="Hand Saw">
+        <h3>Hand Saw</h3>
+        <p class="details">Used for manually cutting wood, plastic, or metal.</p>
+        <div class="btn-group">
+          <button class="add-cart">Add to Cart</button>
+          <button class="view-details" onclick="viewProduct(11)">View Details</button>
+          <button class="buy-now">Buy Now</button>
+        </div>
+      </div>
+
+      <!-- 12 -->
+      <div class="product-card">
+        <img src="hand-tools/Wire Cutter.jpg" alt="Wire Cutter">
+        <h3>Wire Cutter</h3>
+        <p class="details">Designed for cutting electrical wires or small metal cables.</p>
+        <div class="btn-group">
+          <button class="add-cart">Add to Cart</button>
+          <button class="view-details" onclick="viewProduct(12)">View Details</button>
+          <button class="buy-now">Buy Now</button>
+        </div>
+      </div>
+
+      <!-- 13 -->
+      <div class="product-card">
+        <img src="hand-tools/File.jpg" alt="Hand File">
+        <h3>Hand File</h3>
+        <p class="details">A rough-surfaced tool used to smooth, shape, or remove small amounts of material.</p>
+        <div class="btn-group">
+          <button class="add-cart">Add to Cart</button>
+          <button class="view-details" onclick="viewProduct(13)">View Details</button>
+          <button class="buy-now">Buy Now</button>
+        </div>
+      </div>
+
+      <!-- 14 -->
+      <div class="product-card">
+        <img src="hand-tools/Nail Set_Punch..jpg" alt="Nail Set (Punch)">
+        <h3>Nail Set (Punch)</h3>
+        <p class="details">Used to drive the head of a nail below the surface of the wood.</p>
+        <div class="btn-group">
+          <button class="add-cart">Add to Cart</button>
+          <button class="view-details" onclick="viewProduct(14)">View Details</button>
+          <button class="buy-now">Buy Now</button>
+        </div>
+      </div>
+
+      <!-- 15 -->
+      <div class="product-card">
+        <img src="hand-tools/paint-brush.jpg" alt="Small Brush">
+        <h3>Small Brush</h3>
+        <p class="details">Used to clean tools, surfaces, or apply finishing materials in small areas.</p>
+        <div class="btn-group">
+          <button class="add-cart">Add to Cart</button>
+          <button class="view-details" onclick="viewProduct(15)">View Details</button>
+          <button class="buy-now">Buy Now</button>
+        </div>
+      </div>
+
+      <!-- 16 -->
+      <div class="product-card">
+        <img src="hand-tools/Duct Tape.jpg" alt="Duct Tape">
+        <h3>Duct Tape</h3>
+        <p class="details">A strong, multipurpose adhesive tape used for repairs, sealing, or binding materials.</p>
+        <div class="btn-group">
+          <button class="add-cart">Add to Cart</button>
+          <button class="view-details" onclick="viewProduct(16)">View Details</button>
+          <button class="buy-now">Buy Now</button>
+        </div>
+      </div>
+
+      <!-- 17 -->
+      <div class="product-card">
+        <img src="hand-tools/Mallet.jpg" alt="Mallet">
+        <h3>Mallet</h3>
+        <p class="details">A hammer with a rubber or wooden head used to strike without damaging the surface.</p>
+        <div class="btn-group">
+          <button class="add-cart">Add to Cart</button>
+          <button class="view-details" onclick="viewProduct(17)">View Details</button>
+          <button class="buy-now">Buy Now</button>
+        </div>
+      </div>
+
+      <!-- 18 -->
+      <div class="product-card">
+        <img src="hand-tools/Scissors.jpg" alt="Scissors">
+        <h3>Scissors</h3>
+        <p class="details">Used for cutting paper, fabric, or thin materials.</p>
+        <div class="btn-group">
+          <button class="add-cart">Add to Cart</button>
+          <button class="view-details" onclick="viewProduct(18)">View Details</button>
+          <button class="buy-now">Buy Now</button>
+        </div>
+      </div>
+
+      <!-- 19 -->
+      <div class="product-card">
+        <img src="hand-tools/Ruler.jpg" alt="Ruler">
+        <h3>Ruler</h3>
+        <p class="details">A straight-edged measuring tool for drawing lines or measuring short distances.</p>
+        <div class="btn-group">
+          <button class="add-cart">Add to Cart</button>
+          <button class="view-details" onclick="viewProduct(19)">View Details</button>
+          <button class="buy-now">Buy Now</button>
+        </div>
+      </div>
+
+      <!-- 20 -->
+      <div class="product-card">
+        <img src="hand-tools/Toolbox.jpg" alt="Toolbox">
+        <h3>Toolbox</h3>
+        <p class="details">A container used for storing and organizing tools safely and conveniently.</p>
+        <div class="btn-group">
+          <button class="add-cart">Add to Cart</button>
+          <button class="view-details" onclick="viewProduct(20)">View Details</button>
+          <button class="buy-now">Buy Now</button>
+        </div>
+      </div>
+    </div>
+
+
+
+
+
+
+  <!-- 🔘 PAGINATION LINKS (Bottom of section, centered) -->
+  <nav class="pagination" aria-label="Product pages">
+    <!-- left chevron -->
+    <a href="#page-1" class="chev chev-left" aria-label="Previous page">&#x2039;</a>
+
+    <!-- page numbers -->
+    <a href="#page-1" class="page-link active" aria-current="page">1</a>
+    <a href="#page-2" class="page-link">2</a>
+    <a href="#page-3" class="page-link">3</a>
+    <a href="#page-4" class="page-link">4</a>
+    <a href="#page-5" class="page-link">5</a>
+
+    <!-- right chevron -->
+    <a href="#page-2" class="chev chev-right" aria-label="Next page">&#x203A;</a>
+  </nav>
+
+    </div>
+  </div>
+
+
+
+
+  <!-- ✅ PAGE 2 (first 20 products) -->
+
+
+
+
+  <div class="product-page page-2" id="page-2" data-category="Power">
+    <div class="product-grid">
+
+
+      <!-- 1 -->
+      <div class="product-card">
+        <img src="power-tools/Electric Drill.jpg" alt="Electric Drill">
+        <h3>Electric Drill</h3>
+        <p class="details">A power tool used for drilling holes in wood, metal, plastic, and other materials.</p>
+        <div class="btn-group">
+          <button class="add-cart">Add to Cart</button>
+          <button class="view-details" onclick="viewProduct(21)">View Details</button>
+          <button class="buy-now">Buy Now</button>
+        </div>
+      </div>
+
+      <!-- 2 -->
+      <div class="product-card">
+        <img src="power-tools/Cordless Drill.jpg" alt="Cordless Drill">
+        <h3>Cordless Drill</h3>
+        <p class="details">A battery-powered drill that provides mobility and convenience without needing a power cord.</p>
+        <div class="btn-group">
+          <button class="add-cart">Add to Cart</button>
+          <button class="view-details" onclick="viewProduct(22)">View Details</button>
+          <button class="buy-now">Buy Now</button>
+        </div>
+      </div>
+
+      <!-- 3 -->
+      <div class="product-card">
+        <img src="power-tools/Angle Grinder.jpg" alt="Angle Grinder">
+        <h3>Angle Grinder</h3>
+        <p class="details">Used for grinding, cutting, sanding, and polishing metal or concrete surfaces.</p>
+        <div class="btn-group">
+          <button class="add-cart">Add to Cart</button>
+          <button class="view-details" onclick="viewProduct(23)">View Details</button>
+          <button class="buy-now">Buy Now</button>
+        </div>
+      </div>
+
+      <!-- 4 -->
+      <div class="product-card">
+        <img src="power-tools/Circular Saw.jpg" alt="Circular Saw">
+        <h3>Circular Saw</h3>
+        <p class="details">A power saw with a circular blade used for straight cuts in wood, plastic, or metal.</p>
+        <div class="btn-group">
+          <button class="add-cart">Add to Cart</button>
+          <button class="view-details" onclick="viewProduct(24)">View Details</button>
+          <button class="buy-now">Buy Now</button>
+        </div>
+      </div>
+
+      <!-- 5 -->
+      <div class="product-card">
+        <img src="power-tools/Jigsaw.jpg" alt="Jigsaw">
+        <h3>Jigsaw</h3>
+        <p class="details">A tool with a fine blade used for cutting curved or intricate shapes in various materials.</p>
+        <div class="btn-group">
+          <button class="add-cart">Add to Cart</button>
+          <button class="view-details" onclick="viewProduct(25)">View Details</button>
+          <button class="buy-now">Buy Now</button>
+        </div>
+      </div>
+
+      <!-- 6 -->
+      <div class="product-card">
+        <img src="power-tools/Sander.png" alt="Sander">
+        <h3>Sander</h3>
+        <p class="details">Used to smooth or polish surfaces by abrasion with sandpaper.</p>
+        <div class="btn-group">
+          <button class="add-cart">Add to Cart</button>
+         <button class="view-details" onclick="viewProduct(26)">View Details</button>
+          <button class="buy-now">Buy Now</button>
+        </div>
+      </div>
+
+      <!-- 7 -->
+      <div class="product-card">
+        <img src="power-tools/Heat Gun.jpg" alt="Heat Gun">
+        <h3>Heat Gun</h3>
+        <p class="details">Blows hot air; used for stripping paint, shrinking tubing, or softening materials.</p>
+        <div class="btn-group">
+          <button class="add-cart">Add to Cart</button>
+          <button class="view-details" onclick="viewProduct(27)">View Details</button>
+          <button class="buy-now">Buy Now</button>
+        </div>
+      </div>
+
+      <!-- 8 -->
+      <div class="product-card">
+        <img src="power-tools/Rotary Tool.jpg" alt="Rotary Tool">
+        <h3>Rotary Tool</h3>
+        <p class="details">A handheld tool used for engraving, polishing, cutting, sanding, and drilling small items.</p>
+        <div class="btn-group">
+          <button class="add-cart">Add to Cart</button>
+          <button class="view-details" onclick="viewProduct(28)">View Details</button>
+          <button class="buy-now">Buy Now</button>
+        </div>
+      </div>
+
+      <!-- 9 -->
+      <div class="product-card">
+        <img src="power-tools/Impact Driver.jpg" alt="Impact Driver">
+        <h3>Impact Driver</h3>
+        <p class="details">Delivers strong rotational force to drive screws and bolts into tough materials.</p>
+        <div class="btn-group">
+          <button class="add-cart">Add to Cart</button>
+          <button class="view-details" onclick="viewProduct(29)">View Details</button>
+          <button class="buy-now">Buy Now</button>
+        </div>
+      </div>
+
+      <!-- 10 -->
+      <div class="product-card">
+        <img src="power-tools/Electric Screwdriver.jpg" alt="Electric Screwdriver">
+        <h3>Electric Screwdriver</h3>
+        <p class="details">A small powered tool used for driving or removing screws easily.</p>
+        <div class="btn-group">
+          <button class="add-cart">Add to Cart</button>
+          <button class="view-details" onclick="viewProduct(30)">View Details</button>
+          <button class="buy-now">Buy Now</button>
+        </div>
+      </div>
+
+      <!-- 11 -->
+      <div class="product-card">
+        <img src="power-tools/Air Compressor.jpg" alt="Air Compressor">
+        <h3>Air Compressor</h3>
+        <p class="details">Converts power into pressurized air for powering pneumatic tools like nail guns or spray guns.</p>
+        <div class="btn-group">
+          <button class="add-cart">Add to Cart</button>
+          <button class="view-details" onclick="viewProduct(31)">View Details</button>
+          <button class="buy-now">Buy Now</button>
+        </div>
+      </div>
+
+      <!-- 12 -->
+      <div class="product-card">
+        <img src="power-tools/Nail Gun.jpg" alt="Nail Gun">
+        <h3>Nail Gun</h3>
+        <p class="details">Uses compressed air or electricity to drive nails quickly and precisely.</p>
+        <div class="btn-group">
+          <button class="add-cart">Add to Cart</button>
+          <button class="view-details" onclick="viewProduct(32)">View Details</button>
+          <button class="buy-now">Buy Now</button>
+        </div>
+      </div>
+
+      <!-- 13 -->
+      <div class="product-card">
+        <img src="power-tools/Power Washer.jpg" alt="Power Washer (Pressure Washer)">
+        <h3>Power Washer (Pressure Washer)</h3>
+        <p class="details">Uses high-pressure water spray to clean surfaces such as driveways, walls, and vehicles.</p>
+        <div class="btn-group">
+          <button class="add-cart">Add to Cart</button>
+          <button class="view-details" onclick="viewProduct(33)">View Details</button>
+          <button class="buy-now">Buy Now</button>
+        </div>
+      </div>
+
+      <!-- 14 -->
+      <div class="product-card">
+        <img src="power-tools/Electric Cutter.jpg" alt="Electric Cutter">
+        <h3>Electric Cutter</h3>
+        <p class="details">A powered cutting tool used for slicing materials like plastic, rubber, or fabric.</p>
+        <div class="btn-group">
+          <button class="add-cart">Add to Cart</button>
+          <button class="view-details" onclick="viewProduct(34)">View Details</button>
+          <button class="buy-now">Buy Now</button>
+        </div>
+      </div>
+
+      <!-- 15 -->
+      <div class="product-card">
+        <img src="power-tools/Drill Bit.jpg" alt="Drill Bit">
+        <h3>Drill Bit</h3>
+        <p class="details">The metal cutting attachment inserted into drills for making holes.</p>
+        <div class="btn-group">
+          <button class="add-cart">Add to Cart</button>
+          <button class="view-details" onclick="viewProduct(35)">View Details</button>
+          <button class="buy-now">Buy Now</button>
+        </div>
+      </div>
+
+      <!-- 16 -->
+      <div class="product-card">
+        <img src="power-tools/Saw Blade.jpg" alt="Saw Blade">
+        <h3>Saw Blade</h3>
+        <p class="details">A circular or straight-edged blade used with saws to cut through various materials.</p>
+        <div class="btn-group">
+          <button class="add-cart">Add to Cart</button>
+          <button class="view-details" onclick="viewProduct(36)">View Details</button>
+          <button class="buy-now">Buy Now</button>
+        </div>
+      </div>
+
+      <!-- 17 -->
+      <div class="product-card">
+        <img src="power-tools/Sanding Disc.jpg" alt="Sanding Disc">
+        <h3>Sanding Disc</h3>
+        <p class="details">An abrasive disc used with power sanders to smooth or shape surfaces.</p>
+        <div class="btn-group">
+          <button class="add-cart">Add to Cart</button>
+          <button class="view-details" onclick="viewProduct(37)">View Details</button>
+          <button class="buy-now">Buy Now</button>
+        </div>
+      </div>
+
+      <!-- 18 -->
+      <div class="product-card">
+        <img src="power-tools/Cutting Disc.jpg" alt="Cutting Disc">
+        <h3>Cutting Disc</h3>
+        <p class="details">A thin abrasive wheel used with grinders to cut through metal or stone.</p>
+        <div class="btn-group">
+          <button class="add-cart">Add to Cart</button>
+          <button class="view-details" onclick="viewProduct(38)">View Details</button>
+          <button class="buy-now">Buy Now</button>
+        </div>
+      </div>
+
+      <!-- 19 -->
+      <div class="product-card">
+        <img src="power-tools/Extension Cord.jpg" alt="Extension Cord">
+        <h3>Extension Cord</h3>
+        <p class="details">Provides additional reach for electrical tools by extending the length of power cables.</p>
+        <div class="btn-group">
+          <button class="add-cart">Add to Cart</button>
+          <button class="view-details" onclick="viewProduct(39)">View Details</button>
+          <button class="buy-now">Buy Now</button>
+        </div>
+      </div>
+
+      <!-- 20 -->
+      <div class="product-card">
+        <img src="power-tools/Battery.avif" alt="Battery Pack">
+        <h3>Battery Pack</h3>
+        <p class="details">A rechargeable power source used to operate cordless tools.</p>
+        <div class="btn-group">
+          <button class="add-cart">Add to Cart</button>
+          <button class="view-details" onclick="viewProduct(40)">View Details</button>
+          <button class="buy-now">Buy Now</button>
+        </div>
+      </div>
+    </div>
+
+
+
+  <!-- 🔘 PAGINATION LINKS (Bottom of section, centered) -->
+  <nav class="pagination" aria-label="Product pages">
+    <!-- left chevron (go back to page 1) -->
+    <a href="#page-1" class="chev chev-left" aria-label="Previous page">&#x2039;</a>
+
+    <!-- page numbers -->
+    <a href="#page-1" class="page-link">1</a>
+    <a href="#page-2" class="page-link active" aria-current="page">2</a>
+    <a href="#page-3" class="page-link">3</a>
+    <a href="#page-4" class="page-link">4</a>
+    <a href="#page-5" class="page-link">5</a>
+
+    <!-- right chevron (go to page 3) -->
+    <a href="#page-3" class="chev chev-right" aria-label="Next page">&#x203A;</a>
+  </nav>
+
+
+    </div>
+  </div>
+
+
+  <!-- ✅ PAGE 3 (first 20 products) -->
+
+
+
+
+  <div class="product-page page-3" id="page-3" data-category="Painting">
+    <div class="product-grid">
+
+
+      <!-- 1 -->
+      <div class="product-card">
+        <img src="painting-tools/61tPaint Brush.jpg" alt="Paint Brush">
+        <h3>Paint Brush</h3>
+        <p class="details">Used to apply paint on small or detailed areas where rollers can't reach.</p>
+        <div class="btn-group">
+          <button class="add-cart">Add to Cart</button>
+          <button class="view-details" onclick="viewProduct(41)">View Details</button>
+          <button class="buy-now">Buy Now</button>
+        </div>
+      </div>
+
+      <!-- 2 -->
+      <div class="product-card">
+        <img src="painting-tools/Paint Roller.jpg" alt="Paint Roller">
+        <h3>Paint Roller</h3>
+        <p class="details">A cylindrical tool for applying paint quickly and evenly over large flat surfaces like walls and ceilings.</p>
+        <div class="btn-group">
+          <button class="add-cart">Add to Cart</button>
+          <button class="view-details" onclick="viewProduct(42)">View Details</button>
+          <button class="buy-now">Buy Now</button>
+        </div>
+      </div>
+
+      <!-- 3 -->
+      <div class="product-card">
+        <img src="painting-tools/Paint Tray.jpg" alt="Paint Tray">
+        <h3>Paint Tray</h3>
+        <p class="details">A shallow container that holds paint for dipping rollers or brushes.</p>
+        <div class="btn-group">
+          <button class="add-cart">Add to Cart</button>
+          <button class="view-details" onclick="viewProduct(43)">View Details</button>
+          <button class="buy-now">Buy Now</button>
+        </div>
+      </div>
+
+      <!-- 4 -->
+      <div class="product-card">
+        <img src="painting-tools/Putty Knife.jpg" alt="Putty Knife">
+        <h3>Putty Knife</h3>
+        <p class="details">Used to apply, spread, or scrape putty, plaster, or filler on walls and surfaces.</p>
+        <div class="btn-group">
+          <button class="add-cart">Add to Cart</button>
+          <button class="view-details" onclick="viewProduct(44)">View Details</button>
+          <button class="buy-now">Buy Now</button>
+        </div>
+      </div>
+
+      <!-- 5 -->
+      <div class="product-card">
+        <img src="painting-tools/Paint Scraper.jpg" alt="Paint Scraper">
+        <h3>Paint Scraper</h3>
+        <p class="details">Helps remove old paint, wallpaper, or debris from surfaces before painting.</p>
+        <div class="btn-group">
+          <button class="add-cart">Add to Cart</button>
+         <button class="view-details" onclick="viewProduct(45)">View Details</button>
+          <button class="buy-now">Buy Now</button>
+        </div>
+      </div>
+
+      <!-- 6 -->
+      <div class="product-card">
+        <img src="painting-tools/Sandpaper.jpg" alt="Sandpaper">
+        <h3>Sandpaper</h3>
+        <p class="details">A rough paper used to smooth surfaces or remove old paint before finishing.</p>
+        <div class="btn-group">
+          <button class="add-cart">Add to Cart</button>
+          <button class="view-details" onclick="viewProduct(46)">View Details</button>
+          <button class="buy-now">Buy Now</button>
+        </div>
+      </div>
+
+      <!-- 7 -->
+      <div class="product-card">
+        <img src="painting-tools/Paint Mixer.jpg" alt="Paint Mixer">
+        <h3>Paint Mixer</h3>
+        <p class="details">A tool (manual or electric) used to stir paint thoroughly for a consistent color and texture.</p>
+        <div class="btn-group">
+          <button class="add-cart">Add to Cart</button>
+          <button class="view-details" onclick="viewProduct(47)">View Details</button>
+          <button class="buy-now">Buy Now</button>
+        </div>
+      </div>
+
+      <!-- 8 -->
+      <div class="product-card">
+        <img src="painting-tools/Drop Cloth.jpg" alt="Drop Cloth">
+        <h3>Drop Cloth</h3>
+        <p class="details">A protective sheet placed over floors or furniture to catch paint drips and spills.</p>
+        <div class="btn-group">
+          <button class="add-cart">Add to Cart</button>
+          <button class="view-details" onclick="viewProduct(48)">View Details</button>
+          <button class="buy-now">Buy Now</button>
+        </div>
+      </div>
+
+      <!-- 9 -->
+      <div class="product-card">
+        <img src="painting-tools/Paint Sprayer.jpg" alt="Paint Sprayer">
+        <h3>Paint Sprayer</h3>
+        <p class="details">A powered tool that sprays a fine mist of paint for a smooth, even finish on large surfaces.</p>
+        <div class="btn-group">
+          <button class="add-cart">Add to Cart</button>
+          <button class="view-details" onclick="viewProduct(49)">View Details</button>
+          <button class="buy-now">Buy Now</button>
+        </div>
+      </div>
+
+      <!-- 10 -->
+      <div class="product-card">
+        <img src="painting-tools/Paint Can Opener.jpg" alt="Paint Can Opener">
+        <h3>Paint Can Opener</h3>
+        <p class="details">A metal tool used to safely open paint cans without damaging the lid.</p>
+        <div class="btn-group">
+          <button class="add-cart">Add to Cart</button>
+          <button class="view-details" onclick="viewProduct(50)">View Details</button>
+          <button class="buy-now">Buy Now</button>
+        </div>
+      </div>
+
+      <!-- 11 -->
+      <div class="product-card">
+        <img src="painting-tools/Paint Stirrer.jpg" alt="Paint Stirrer">
+        <h3>Paint Stirrer</h3>
+        <p class="details">A flat stick or paddle used to manually mix paint before application.</p>
+        <div class="btn-group">
+          <button class="add-cart">Add to Cart</button>
+          <button class="view-details" onclick="viewProduct(51)">View Details</button>
+          <button class="buy-now">Buy Now</button>
+        </div>
+      </div>
+
+      <!-- 12 -->
+      <div class="product-card">
+        <img src="painting-tools/Masking Tape.jpg" alt="Masking Tape">
+        <h3>Masking Tape</h3>
+        <p class="details">Used to protect edges or areas that shouldn't be painted, creating clean paint lines.</p>
+        <div class="btn-group">
+          <button class="add-cart">Add to Cart</button>
+          <button class="view-details" onclick="viewProduct(52)">View Details</button>
+          <button class="buy-now">Buy Now</button>
+        </div>
+      </div>
+
+      <!-- 13 -->
+      <div class="product-card">
+        <img src="painting-tools/Paint Edger.jpg" alt="Paint Edger">
+        <h3>Paint Edger</h3>
+        <p class="details">A handheld tool that helps apply paint neatly along edges and corners.</p>
+        <div class="btn-group">
+          <button class="add-cart">Add to Cart</button>
+          <button class="view-details" onclick="viewProduct(53)">View Details</button>
+          <button class="buy-now">Buy Now</button>
+        </div>
+      </div>
+
+      <!-- 14 -->
+      <div class="product-card">
+        <img src="painting-tools/Paint Bucket.jpg" alt="Paint Bucket">
+        <h3>Paint Bucket</h3>
+        <p class="details">A container used for holding larger amounts of paint during painting jobs.</p>
+        <div class="btn-group">
+          <button class="add-cart">Add to Cart</button>
+          <button class="view-details" onclick="viewProduct(54)">View Details</button>
+          <button class="buy-now">Buy Now</button>
+        </div>
+      </div>
+
+      <!-- 15 -->
+      <div class="product-card">
+        <img src="painting-tools/Caulking Gun.jpg" alt="Caulking Gun">
+        <h3>Caulking Gun</h3>
+        <p class="details">Holds and dispenses caulk to seal cracks or gaps in surfaces before painting.</p>
+        <div class="btn-group">
+          <button class="add-cart">Add to Cart</button>
+          <button class="view-details" onclick="viewProduct(55)">View Details</button>
+          <button class="buy-now">Buy Now</button>
+        </div>
+      </div>
+
+      <!-- 16 -->
+      <div class="product-card">
+        <img src="painting-tools/Sponge.jpg" alt="Sponge">
+        <h3>Sponge</h3>
+        <p class="details">Used for cleaning surfaces, blending paint textures, or creating decorative paint effects.</p>
+        <div class="btn-group">
+          <button class="add-cart">Add to Cart</button>
+          <button class="view-details" onclick="viewProduct(56)">View Details</button>
+          <button class="buy-now">Buy Now</button>
+        </div>
+      </div>
+
+      <!-- 17 -->
+      <div class="product-card">
+        <img src="painting-tools/Wire Brush.jpg" alt="Wire Brush">
+        <h3>Wire Brush</h3>
+        <p class="details">Used to clean rough surfaces, remove rust, or scrub off old paint before refinishing.</p>
+        <div class="btn-group">
+          <button class="add-cart">Add to Cart</button>
+          <button class="view-details" onclick="viewProduct(57)">View Details</button>
+          <button class="buy-now">Buy Now</button>
+        </div>
+      </div>
+
+      <!-- 18 -->
+      <div class="product-card">
+        <img src="painting-tools/Dust Mask.jpg" alt="Dust Mask">
+        <h3>Dust Mask</h3>
+        <p class="details">Worn to protect against inhaling dust, paint fumes, or small particles while working.</p>
+        <div class="btn-group">
+          <button class="add-cart">Add to Cart</button>
+          <button class="view-details" onclick="viewProduct(58)">View Details</button>
+          <button class="buy-now">Buy Now</button>
+        </div>
+      </div>
+
+      <!-- 19 -->
+      <div class="product-card">
+        <img src="painting-tools/Protective Goggles.jpg" alt="Protective Goggles">
+        <h3>Protective Goggles</h3>
+        <p class="details">Anti-fog safety goggles for maximum eye protection.</p>
+        <div class="btn-group">
+          <button class="add-cart">Add to Cart</button>
+          <button class="view-details" onclick="viewProduct(59)">View Details</button>
+          <button class="buy-now">Buy Now</button>
+        </div>
+      </div>
+
+      <!-- 20 -->
+      <div class="product-card">
+        <img src="painting-tools/Paint Roller Extension Pole.jpg" alt="Paint Roller Extension Pole">
+        <h3>Paint Roller Extension Pole</h3>
+        <p class="details">Attaches to a paint roller to reach high walls and ceilings without a ladder.</p>
+        <div class="btn-group">
+          <button class="add-cart">Add to Cart</button>
+          <button class="view-details" onclick="viewProduct(60)">View Details</button>
+          <button class="buy-now">Buy Now</button>
+        </div>
+      </div>
+    </div>
+
+
+
+  <!-- 🔘 PAGINATION LINKS (Bottom of section, centered) -->
+    <nav class="pagination" aria-label="Product pages">
+    <!-- left chevron -->
+    <a href="#page-2" class="chev chev-left" aria-label="Previous page">&#x2039;</a>
+
+    <!-- page numbers -->
+    <a href="#page-1" class="page-link">1</a>
+    <a href="#page-2" class="page-link">2</a>
+    <a href="#page-3" class="page-link active" aria-current="page">3</a>
+    <a href="#page-4" class="page-link">4</a>
+    <a href="#page-5" class="page-link">5</a>
+
+    <!-- right chevron -->
+    <a href="#page-4" class="chev chev-right" aria-label="Next page">&#x203A;</a>
+  </nav>
+
+
+    </div>
+  </div>
+
+  <!-- ✅ PAGE 4 (first 20 products) -->
+
+
+  <div class="product-page page-4" id="page-4" data-category="Fastening">
+    <div class="product-grid">
+
+
+      <!-- 1 -->
+      <div class="product-card">
+        <img src="fastening-tools/Combination Pliers.jpg.jpg" alt="Combination Pliers">
+        <h3>Combination Pliers</h3>
+        <p class="details">Multi-purpose pliers used for gripping, twisting, bending, and cutting wires or small metal parts.</p>
+        <div class="btn-group">
+          <button class="add-cart">Add to Cart</button>
+          <button class="view-details" onclick="viewProduct(61)">View Details</button>
+          <button class="buy-now">Buy Now</button>
+        </div>
+      </div>
+
+      <!-- 2 -->
+      <div class="product-card">
+        <img src="fastening-tools/Water Pump Pliers.jpg.jpg" alt="Water Pump Pliers">
+        <h3>Water Pump Pliers</h3>
+        <p class="details">Adjustable pliers designed for gripping large nuts, bolts, and pipes of varying sizes.</p>
+        <div class="btn-group">
+          <button class="add-cart">Add to Cart</button>
+          <button class="view-details" onclick="viewProduct(62)">View Details</button>
+          <button class="buy-now">Buy Now</button>
+        </div>
+      </div>
+
+      <!-- 3 -->
+      <div class="product-card">
+        <img src="fastening-tools/Locking Clamp.jpg.jpg" alt="Locking Clamp">
+        <h3>Locking Clamp</h3>
+        <p class="details">A clamp with a locking mechanism (similar to a vise grip) used to hold materials securely in place.</p>
+        <div class="btn-group">
+          <button class="add-cart">Add to Cart</button>
+          <button class="view-details" onclick="viewProduct(63)">View Details</button>
+          <button class="buy-now">Buy Now</button>
+        </div>
+      </div>
+
+      <!-- 4 -->
+      <div class="product-card">
+        <img src="fastening-tools/Ratcheting Wrench.jpg.jpg" alt="Ratcheting Wrench">
+        <h3>Ratcheting Wrench</h3>
+        <p class="details">A wrench with a built-in ratchet mechanism that allows tightening or loosening without removing the tool from the fastener.</p>
+        <div class="btn-group">
+          <button class="add-cart">Add to Cart</button>
+          <button class="view-details" onclick="viewProduct(64)">View Details</button>
+          <button class="buy-now">Buy Now</button>
+        </div>
+      </div>
+
+      <!-- 5 -->
+      <div class="product-card">
+        <img src="fastening-tools/Box-End Wrench.jpg.jpg" alt="Box-End Wrench">
+        <h3>Box-End Wrench</h3>
+        <p class="details">A closed-loop wrench that fits completely around a nut or bolt for maximum grip and torque.</p>
+        <div class="btn-group">
+          <button class="add-cart">Add to Cart</button>
+          <button class="view-details" onclick="viewProduct(65)">View Details</button>
+          <button class="buy-now">Buy Now</button>
+        </div>
+      </div>
+
+      <!-- 6 -->
+      <div class="product-card">
+        <img src="fastening-tools/Crowfoot Wrench.jpg.jpg" alt="Crowfoot Wrench">
+        <h3>Crowfoot Wrench</h3>
+        <p class="details">An open-ended wrench head designed to reach fasteners in tight or recessed spaces when attached to a ratchet or extension bar.</p>
+        <div class="btn-group">
+          <button class="add-cart">Add to Cart</button>
+          <button class="view-details" onclick="viewProduct(66)">View Details</button>
+          <button class="buy-now">Buy Now</button>
+        </div>
+      </div>
+
+      <!-- 7 -->
+      <div class="product-card">
+        <img src="fastening-tools/Speed Wrench.jpg.jpg" alt="Speed Wrench">
+        <h3>Speed Wrench</h3>
+        <p class="details">A wrench with a rotating handle for quickly tightening or loosening nuts and bolts.</p>
+        <div class="btn-group">
+          <button class="add-cart">Add to Cart</button>
+          <button class="view-details" onclick="viewProduct(67)">View Details</button>
+          <button class="buy-now">Buy Now</button>
+        </div>
+      </div>
+
+      <!-- 8 -->
+      <div class="product-card">
+        <img src="fastening-tools/T-Handle Wrench.jpg.jpg" alt="T-Handle Wrench">
+        <h3>T-Handle Wrench</h3>
+        <p class="details">A wrench with a “T” shaped handle that provides better leverage and control when tightening or loosening fasteners.</p>
+        <div class="btn-group">
+          <button class="add-cart">Add to Cart</button>
+          <button class="view-details" onclick="viewProduct(68)">View Details</button>
+          <button class="buy-now">Buy Now</button>
+        </div>
+      </div>
+
+      <!-- 9 -->
+      <div class="product-card">
+        <img src="fastening-tools/Torque Multiplier.jpg.jpg" alt="Torque Multiplier">
+        <h3>Torque Multiplier</h3>
+        <p class="details">A tool that increases the torque applied to a fastener without requiring additional force from the user.</p>
+        <div class="btn-group">
+          <button class="add-cart">Add to Cart</button>
+          <button class="view-details" onclick="viewProduct(69)">View Details</button>
+          <button class="buy-now">Buy Now</button>
+        </div>
+      </div>
+
+      <!-- 10 -->
+      <div class="product-card">
+        <img src="fastening-tools/Nut Splitter.jpg.jpg" alt="Nut Splitter">
+        <h3>Nut Splitter</h3>
+        <p class="details">A tool used to remove stubborn or rusted nuts without damaging the bolt threads.</p>
+        <div class="btn-group">
+          <button class="add-cart">Add to Cart</button>
+          <button class="view-details" onclick="viewProduct(80)">View Details</button>
+          <button class="buy-now">Buy Now</button>
+        </div>
+      </div>
+
+      <!-- 11 -->
+      <div class="product-card">
+        <img src="fastening-tools/Snap Ring Pliers.jpg.jpg" alt="Snap Ring Pliers">
+        <h3>Snap Ring Pliers</h3>
+        <p class="details">Specialized pliers used to install or remove snap rings (retaining rings) from shafts or housings.</p>
+        <div class="btn-group">
+          <button class="add-cart">Add to Cart</button>
+          <button class="view-details" onclick="viewProduct(71)">View Details</button>
+          <button class="buy-now">Buy Now</button>
+        </div>
+      </div>
+
+      <!-- 12 -->
+      <div class="product-card">
+        <img src="fastening-tools/Hog Ring Pliers.jpg.jpg" alt="Hog Ring Pliers">
+        <h3>Hog Ring Pliers</h3>
+        <p class="details">Used to clamp hog rings (metal fasteners) around materials such as fencing, upholstery, or wire mesh.</p>
+        <div class="btn-group">
+          <button class="add-cart">Add to Cart</button>
+          <button class="view-details" onclick="viewProduct(72)">View Details</button>
+          <button class="buy-now">Buy Now</button>
+        </div>
+      </div>
+
+      <!-- 13 -->
+      <div class="product-card">
+        <img src="fastening-tools/Caulking Gun.jpg.jpg" alt="Caulking Gun">
+        <h3>Caulking Gun</h3>
+        <p class="details">A hand tool used to dispense caulk or sealant for filling gaps and sealing joints.</p>
+        <div class="btn-group">
+          <button class="add-cart">Add to Cart</button>
+          <button class="view-details" onclick="viewProduct(73)">View Details</button>
+          <button class="buy-now">Buy Now</button>
+        </div>
+      </div>
+
+      <!-- 14 -->
+      <div class="product-card">
+        <img src="fastening-tools/Pop Riveter.jpg.jpg" alt="Pop Riveter (Rivet Gun)">
+        <h3>Pop Riveter (Rivet Gun)</h3>
+        <p class="details">A tool used to fasten materials together with rivets, often used in metalwork and construction.</p>
+        <div class="btn-group">
+          <button class="add-cart">Add to Cart</button>
+          <button class="view-details" onclick="viewProduct(74)">View Details</button>
+          <button class="buy-now">Buy Now</button>
+        </div>
+      </div>
+
+      <!-- 15 -->
+      <div class="product-card">
+        <img src="fastening-tools/Spring Clamp.jpg.jpg" alt="Spring Clamp">
+        <h3>Spring Clamp</h3>
+        <p class="details">A small clamp with a spring mechanism used to hold lightweight materials temporarily during assembly or gluing.</p>
+        <div class="btn-group">
+          <button class="add-cart">Add to Cart</button>
+          <button class="view-details" onclick="viewProduct(75)">View Details</button>
+          <button class="buy-now">Buy Now</button>
+        </div>
+      </div>
+
+      <!-- 16 -->
+      <div class="product-card">
+        <img src="fastening-tools/Bar Clamp.jpg.jpg" alt="Bar Clamp">
+        <h3>Bar Clamp</h3>
+        <p class="details">A long, adjustable clamp used to hold large workpieces together during construction or woodworking.</p>
+        <div class="btn-group">
+          <button class="add-cart">Add to Cart</button>
+          <button class="view-details" onclick="viewProduct(76)">View Details</button>
+          <button class="buy-now">Buy Now</button>
+        </div>
+      </div>
+
+      <!-- 17 -->
+      <div class="product-card">
+        <img src="fastening-tools/Toggle Clamp.jpg.jpg" alt="Toggle Clamp">
+        <h3>Toggle Clamp</h3>
+        <p class="details">A quick-action clamp that locks securely in place, often used in jigs, fixtures, and assembly lines.</p>
+        <div class="btn-group">
+          <button class="add-cart">Add to Cart</button>
+          <button class="view-details" onclick="viewProduct(77)">View Details</button>
+          <button class="buy-now">Buy Now</button>
+        </div>
+      </div>
+
+      <!-- 18 -->
+      <div class="product-card">
+        <img src="fastening-tools/Bench Vise.jpg.jpg" alt="Bench Vise">
+        <h3>Bench Vise</h3>
+        <p class="details">A heavy-duty clamping device mounted on a workbench to hold materials securely for cutting, filing, or drilling.</p>
+        <div class="btn-group">
+          <button class="add-cart">Add to Cart</button>
+          <button class="view-details" onclick="viewProduct(78)">View Details</button>
+          <button class="buy-now">Buy Now</button>
+        </div>
+      </div>
+
+      <!-- 19 -->
+      <div class="product-card">
+        <img src="fastening-tools/Anchor Setting Tool.jpg.jpg" alt="Anchor Setting Tool">
+        <h3>Anchor Setting Tool</h3>
+        <p class="details">Used to set or tighten anchors into walls, floors, or concrete surfaces for secure mounting.</p>
+        <div class="btn-group">
+          <button class="add-cart">Add to Cart</button>
+          <button class="view-details" onclick="viewProduct(79)">View Details</button>
+          <button class="buy-now">Buy Now</button>
+        </div>
+      </div>
+
+      <!-- 20 -->
+      <div class="product-card">
+        <img src="fastening-tools/Wire Twister Pliers.jpg.jpg" alt="Wire Twisting Pliers">
+        <h3>Wire Twisting Pliers</h3>
+        <p class="details">Pliers designed to twist multiple wires together neatly and quickly,
+                           commonly used in electrical or aviation work.</p>
+        <div class="btn-group">
+          <button class="add-cart">Add to Cart</button>
+         <button class="view-details" onclick="viewProduct(80)">View Details</button>
+          <button class="buy-now">Buy Now</button>
+        </div>
+      </div>
+    </div>
+
+
+
+  <!-- 🔘 PAGINATION LINKS (Bottom of section, centered) -->
+    <nav class="pagination" aria-label="Product pages">
+    <!-- left chevron -->
+    <a href="#page-3" class="chev chev-left" aria-label="Previous page">&#x2039;</a>
+
+    <!-- page numbers -->
+    <a href="#page-1" class="page-link">1</a>
+    <a href="#page-2" class="page-link">2</a>
+    <a href="#page-3" class="page-link">3</a>
+    <a href="#page-4" class="page-link active" aria-current="page">4</a>
+    <a href="#page-5" class="page-link">5</a>
+
+    <!-- right chevron -->
+    <a href="#page-5" class="chev chev-right" aria-label="Next page">&#x203A;</a>
+  </nav>
+
+
+    </div>
+  </div>
+
+
+
+  <!-- ✅ PAGE 5 (next 15 products) -->
+
+<div class="product-page page-5" id="page-5" data-category="Bolts">
+    <div class="product-grid">
+
+    <!-- 1 -->
+    <div class="product-card">
+    <img src="Bolts/Hex bolt.jpg.jpg" alt="Hex Bolt">
+    <h3>Hex Bolt</h3>
+    <p class="details">Six-sided head; used in construction and machinery.</p>
+    <div class="btn-group">
+    <button class="add-cart">Add to Cart</button>
+    <button class="view-details" onclick="viewProduct(81)">View Details</button>
+    <button class="buy-now">Buy Now</button>
+    </div>
+    </div>
+
+      <!-- 2 -->
+      <div class="product-card">
+        <img src="Bolts/Carriage Bolt.jpg.jpg" alt="Carriage Bolt">
+        <h3>Carriage Bolt</h3>
+        <p class="details">Round head with square neck; locks into wood.</p>
+        <div class="btn-group">
+          <button class="add-cart">Add to Cart</button>
+          <button class="view-details" onclick="viewProduct(82)">View Details</button>
+          <button class="buy-now">Buy Now</button>
+        </div>
+      </div>
+
+      <!-- 3 -->
+      <div class="product-card">
+        <img src="Bolts/Lag Bolt.jpg.jpg" alt="Lag Bolt">
+        <h3>Lag Bolt</h3>
+        <p class="details">Heavy-duty wood fastener with coarse threads.</p>
+        <div class="btn-group">
+          <button class="add-cart">Add to Cart</button>
+          <button class="view-details" onclick="viewProduct(83)">View Details</button>
+          <button class="buy-now">Buy Now</button>
+        </div>
+      </div>
+
+      <!-- 4 -->
+      <div class="product-card">
+        <img src="Bolts/Anchor Bolt.jpg.jpg" alt="Anchor Bolt">
+        <h3>Anchor Bolt</h3>
+        <p class="details">Secures structures to concrete bases.</p>
+        <div class="btn-group">
+          <button class="add-cart">Add to Cart</button>
+          <button class="view-details" onclick="viewProduct(84)">View Details</button>
+          <button class="buy-now">Buy Now</button>
+        </div>
+      </div>
+
+      <!-- 5 -->
+      <div class="product-card">
+        <img src="Bolts/Eye Bolt.jpg.jpg" alt="Eye Bolt">
+        <h3>Eye Bolt</h3>
+        <p class="details">Loop end for lifting or securing loads.</p>
+        <div class="btn-group">
+          <button class="add-cart">Add to Cart</button>
+          <button class="view-details" onclick="viewProduct(85)">View Details</button>
+          <button class="buy-now">Buy Now</button>
+        </div>
+      </div>
+
+      <!-- 6 -->
+      <div class="product-card">
+        <img src="Bolts/J-Bolt.jpg.jpg" alt="J-Bolt">
+        <h3>J-Bolt</h3>
+        <p class="details">J-shaped; anchors into concrete or holds items.</p>
+        <div class="btn-group">
+          <button class="add-cart">Add to Cart</button>
+          <button class="view-details" onclick="viewProduct(86)">View Details</button>
+          <button class="buy-now">Buy Now</button>
+        </div>
+      </div>
+
+      <!-- 7 -->
+      <div class="product-card">
+        <img src="Bolts/U-Bolt.jpg.jpg" alt="U-Bolt">
+        <h3>U-Bolt</h3>
+        <p class="details">U-shaped; holds pipes or round bars.</p>
+        <div class="btn-group">
+          <button class="add-cart">Add to Cart</button>
+          <button class="view-details" onclick="viewProduct(87)">View Details</button>
+          <button class="buy-now">Buy Now</button>
+        </div>
+      </div>
+
+      <!-- 8 -->
+      <div class="product-card">
+        <img src="Bolts/Flange Bolt.jpg.jpg" alt="Flange Bolt">
+        <h3>Flange Bolt</h3>
+        <p class="details">Built-in washer head; resists loosening.</p>
+        <div class="btn-group">
+          <button class="add-cart">Add to Cart</button>
+          <button class="view-details" onclick="viewProduct(88)">View Details</button>
+          <button class="buy-now">Buy Now</button>
+        </div>
+      </div>
+
+      <!-- 9 -->
+      <div class="product-card">
+        <img src="Bolts/Shoulder Bolt.jpg.jpg" alt="Shoulder Bolt">
+        <h3>Shoulder Bolt</h3>
+        <p class="details">Smooth shoulder allows part rotation.</p>
+        <div class="btn-group">
+          <button class="add-cart">Add to Cart</button>
+          <button class="view-details" onclick="viewProduct(89)">View Details</button>
+          <button class="buy-now">Buy Now</button>
+        </div>
+      </div>
+
+      <!-- 10 -->
+      <div class="product-card">
+        <img src="Bolts/Machine Bolt.jpg.jpg" alt="Machine Bolt">
+        <h3>Machine Bolt</h3>
+        <p class="details">Fully threaded for metal connections.</p>
+        <div class="btn-group">
+          <button class="add-cart">Add to Cart</button>
+          <button class="view-details" onclick="viewProduct(90)">View Details</button>
+          <button class="buy-now">Buy Now</button>
+        </div>
+      </div>
+
+      <!-- 11 -->
+      <div class="product-card">
+        <img src="Bolts/Stud Bolt.jpg.jpg" alt="Stud Bolt">
+        <h3>Stud Bolt</h3>
+        <p class="details">Headless; threaded both ends for flanges.</p>
+        <div class="btn-group">
+          <button class="add-cart">Add to Cart</button>
+          <button class="view-details" onclick="viewProduct(91)">View Details</button>
+          <button class="buy-now">Buy Now</button>
+        </div>
+      </div>
+
+      <!-- 12 -->
+      <div class="product-card">
+        <img src="Bolts/T Bolt.jph.jpg" alt="T-Bolt">
+        <h3>T-Bolt</h3>
+        <p class="details">T-shaped; fits into slots for adjustments.</p>
+        <div class="btn-group">
+          <button class="add-cart">Add to Cart</button>
+          <button class="view-details" onclick="viewProduct(92)">View Details</button>
+          <button class="buy-now">Buy Now</button>
+        </div>
+      </div>
+
+      <!-- 13 -->
+      <div class="product-card">
+        <img src="Bolts/Socket Head Bolt.jpg.jpg" alt="Socket Head Bolt">
+        <h3>Socket Head Bolt</h3>
+        <p class="details">Hex recess head; tightened with Allen key.</p>
+        <div class="btn-group">
+          <button class="add-cart">Add to Cart</button>
+          <button class="view-details" onclick="viewProduct(93)">View Details</button>
+          <button class="buy-now">Buy Now</button>
+        </div>
+      </div>
+
+      <!-- 14 -->
+      <div class="product-card">
+        <img src="Bolts/Square Head Bolt.jpg.jpg" alt="Square Head Bolt">
+        <h3>Square Head Bolt</h3>
+        <p class="details">Square head for firm grip.</p>
+        <div class="btn-group">
+          <button class="add-cart">Add to Cart</button>
+          <button class="view-details" onclick="viewProduct(94)">View Details</button>
+          <button class="buy-now">Buy Now</button>
+        </div>
+      </div>
+
+      <!-- 15 -->
+      <div class="product-card">
+        <img src="Bolts/Elevator Bolt.jpg.jpg" alt="Elevator Bolt">
+        <h3>Elevator Bolt</h3>
+        <p class="details">Flat head for conveyor belts.</p>
+        <div class="btn-group">
+          <button class="add-cart">Add to Cart</button>
+          <button class="view-details" onclick="viewProduct(95)">View Details</button>
+          <button class="buy-now">Buy Now</button>
+        </div>
+      </div>
+
+      <!-- 16 -->
+      <div class="product-card">
+        <img src="Bolts/Toggle Bolt.jpg.jpg" alt="Toggle Bolt">
+        <h3>Toggle Bolt</h3>
+        <p class="details">Spring anchor for hollow walls.</p>
+        <div class="btn-group">
+          <button class="add-cart">Add to Cart</button>
+          <button class="view-details" onclick="viewProduct(96)">View Details</button>
+          <button class="buy-now">Buy Now</button>
+        </div>
+      </div>
+
+      <!-- 17 -->
+      <div class="product-card">
+        <img src="Bolts/Chicago Bolt.jpg.jpg" alt="Chicago Bolt">
+        <h3>Chicago Bolt</h3>
+        <p class="details">Male-female screw pair for furniture.</p>
+        <div class="btn-group">
+          <button class="add-cart">Add to Cart</button>
+          <button class="view-details" onclick="viewProduct(97)">View Details</button>
+          <button class="buy-now">Buy Now</button>
+        </div>
+      </div>
+
+      <!-- 18 -->
+      <div class="product-card">
+        <img src="Bolts/Roofing Bolt.jpg.jpg" alt="Roofing Bolt">
+        <h3>Roofing Bolt</h3>
+        <p class="details">Flat head for roofing sheets.</p>
+        <div class="btn-group">
+          <button class="add-cart">Add to Cart</button>
+          <button class="view-details" onclick="viewProduct(98)">View Details</button>
+          <button class="buy-now">Buy Now</button>
+        </div>
+      </div>
+
+      <!-- 19 -->
+      <div class="product-card">
+        <img src="Bolts/Step Bolt.jpg.jpg" alt="Step Bolt">
+        <h3>Step Bolt</h3>
+        <p class="details">Large head; used as pole steps.</p>
+        <div class="btn-group">
+          <button class="add-cart">Add to Cart</button>
+          <button class="view-details" onclick="viewProduct(99)">View Details</button>
+          <button class="buy-now">Buy Now</button>
+        </div>
+      </div>
+
+      <!-- 20 -->
+      <div class="product-card">
+        <img src="Bolts/Hanger Bolt.jpg.jpg" alt="Hanger Bolt">
+        <h3>Hanger Bolt</h3>
+        <p class="details">Wood screw one end, machine thread other.</p>
+        <div class="btn-group">
+          <button class="add-cart">Add to Cart</button>
+          <button class="view-details" onclick="viewProduct(100)">View Details</button>
+          <button class="buy-now">Buy Now</button>
+        </div>
+</div>
+
+
+</div>
+<!-- 🔘 PAGINATION LINKS (Bottom of section, centered) -->
+    <nav class="pagination" aria-label="Product pages">
+    <!-- left chevron -->
+    <a href="#page-4" class="chev chev-left" aria-label="Previous page">&#x2039;</a>
+
+    <!-- page numbers -->
+    <a href="#page-1" class="page-link">1</a>
+    <a href="#page-2" class="page-link">2</a>
+    <a href="#page-3" class="page-link">3</a>
+    <a href="#page-4" class="page-link">4</a>
+    <a href="#page-5" class="page-link active" aria-current="page">5</a>
+
+    <!-- right chevron (disabled on last page) -->
+    <span class="chev chev-right disabled" aria-disabled="true">&#x203A;</span>
+  </nav>
+</div>
+
+
+
+
+  <!-- viewProduct and cart indicator initialization moved to index.js to avoid duplicate handlers -->
+</section>
+</section>
+
+
+
+
+  <!-- About Section -->
+  <section id="about" class="about-section">
+    <div class="about-container">
+      <div class="about-left">
+        <img src="image/about.jpg" alt="About E-Hardware">
+      </div>
+      <div class="about-right">
+        <h2>About E-Hardware</h2>
+        <p>
+          Founded with a passion for craftsmanship and innovation, <strong>E-Hardware</strong>
+          is your trusted online destination for high-quality tools, equipment, and hardware
+          essentials. Whether you’re a professional contractor, engineer, or a DIY enthusiast,
+          we provide the right tools to help you build with confidence and precision.
+        </p>
+        <h3>Our Mission</h3>
+        <p>
+          To empower builders and creators by offering reliable, affordable, and durable
+          hardware products that make every project a success.
+        </p>
+        <h3>Our Vision</h3>
+        <p>
+          To be the leading hardware provider that bridges innovation and quality, supporting
+          every craftsman across the nation with tools they can truly depend on.
+        </p>
+        <h3>Our Core Values</h3>
+        <ul class="core-values">
+          <li><i class="fas fa-tools"></i> Quality Products You Can Trust</li>
+          <li><i class="fas fa-handshake"></i> Excellent Customer Service</li>
+          <li><i class="fas fa-recycle"></i> Sustainable and Ethical Sourcing</li>
+          <li><i class="fas fa-bolt"></i> Continuous Innovation</li>
+        </ul>
+        <a href="#Product" class="btn-primary">Shop Now</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- Services Section -->
+  <section id="Services" class="services-section">
+    <div class="services-container">
+      <h2 class="section-title">Our Services</h2>
+      <p class="section-subtitle">
+        At <strong>E-Hardware</strong>, we don’t just sell tools — we provide solutions that help
+        builders, homeowners, and professionals get the job done right.
+      </p>
+      <div class="services-grid">
+        <div class="service-card">
+          <i class="fas fa-wrench service-icon"></i>
+          <h3>Tool Repair & Maintenance</h3>
+          <p>Bring your old or damaged tools back to life. Our experts handle repairs and maintenance for all major brands.</p>
+        </div>
+        <div class="service-card">
+          <i class="fas fa-shipping-fast service-icon"></i>
+          <h3>Fast Delivery</h3>
+          <p>Enjoy quick and secure delivery right to your doorstep. We make sure your tools arrive on time and in perfect condition.</p>
+        </div>
+        <div class="service-card">
+          <i class="fas fa-hard-hat service-icon"></i>
+          <h3>Custom Tool Orders</h3>
+          <p>Looking for something specific? We help you source specialty tools and hardware based on your project needs.</p>
+        </div>
+        <div class="service-card">
+          <i class="fas fa-hand-holding-usd service-icon"></i>
+          <h3>Bulk Orders & Discounts</h3>
+          <p>We offer competitive pricing for contractors, construction firms, and large-scale projects — save more with E-Hardware.</p>
+        </div>
+        <div class="service-card">
+          <i class="fas fa-users-cog service-icon"></i>
+          <h3>Expert Consultation</h3>
+          <p>Need advice? Our team of professionals can help you choose the right tools and materials for your work.</p>
+        </div>
+        <div class="service-card">
+          <i class="fas fa-tools service-icon"></i>
+          <h3>Installation Support</h3>
+          <p>We assist with basic installations and usage guides for selected products to ensure safety and quality results.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+ <!-- Contact Section -->
+  <section id="contact" class="contact-section">
+    <div class="contact-container">
+      <h2 class="section-title">Contact Us</h2>
+      <p class="section-subtitle">
+        Have a question or need help with your order? Our team at <strong>E-Hardware</strong>
+        is ready to assist you. Reach out through the form or our contact details below.
+      </p>
+      <div class="contact-content">
+        <!-- Left side: Form -->
+        <div class="contact-form">
+          <form action="#" method="post">
+            <div class="form-group">
+              <label for="name">Name</label>
+              <input type="text" id="name" name="name" placeholder="Your Name" required>
+            </div>
+            <div class="form-group">
+              <label for="email">Email</label>
+              <input type="email" id="email" name="email" placeholder="Your Email" required>
+            </div>
+            <div class="form-group">
+              <label for="message">Message</label>
+              <textarea id="message" name="message" rows="5" placeholder="Your Message" required></textarea>
+            </div>
+            <button type="submit" class="btn-primary">Send Message</button>
+          </form>
+        </div>
+        <!-- Right side: Info -->
+        <div class="contact-info">
+          <h3>Get in Touch</h3>
+          <p><i class="fas fa-map-marker-alt"></i> 123 E-Hardware St., Manila, Philippines</p>
+          <p><i class="fas fa-phone-alt"></i> +63 912 345 6789</p>
+          <p><i class="fas fa-envelope"></i> support@e-hardware.com</p>
+          <h3>Business Hours</h3>
+          <p><i class="fas fa-clock"></i> Mon - Sat: 8:00 AM – 6:00 PM</p>
+          <p><i class="fas fa-clock"></i> Sunday: Closed</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Footer Section -->
+  <footer class="footer">
+    <div class="footer-container">
+      <!-- About -->
+      <div class="footer-about">
+        <h3>E-Hardware</h3>
+        <p>
+          Your trusted source for high-quality hardware tools and equipment.
+          We provide durable, reliable, and affordable solutions for professionals and DIY enthusiasts.
+        </p>
+      </div>
+      <!-- Quick Links -->
+      <div class="footer-links">
+        <h3>Quick Links</h3>
+        <ul>
+          <li><a href="#home">Home</a></li>
+          <li><a href="#Product">Products</a></li>
+          <li><a href="#about">About</a></li>
+          <li><a href="#Services">Services</a></li>
+          <li><a href="#contact">Contact</a></li>
+        </ul>
+      </div>
+      <!-- Contact Info -->
+      <div class="footer-contact">
+        <h3>Contact Info</h3>
+        <p><i class="fas fa-map-marker-alt"></i> 123 E-Hardware St., Manila, Philippines</p>
+        <p><i class="fas fa-phone-alt"></i> +63 912 345 6789</p>
+        <p><i class="fas fa-envelope"></i> support@e-hardware.com</p>
+        <div class="social-icons">
+          <a href="#"><i class="fab fa-facebook-f"></i></a>
+          <a href="#"><i class="fab fa-instagram"></i></a>
+          <a href="#"><i class="fab fa-twitter"></i></a>
+        </div>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <p>&copy; 2025 E-Hardware. All Rights Reserved.</p>
+    </div>
+  </footer>
+
+
+  <script src="index.js"></script>
+
+
+</body>
+</html>

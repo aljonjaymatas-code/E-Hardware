@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Product Details | E-Hardware</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+  <link rel="stylesheet" href="productsskin.css">
+
+  <!-- ✅ Load same JS -->
+  <script src="index.js" defer></script>
+</head>
+<body>
+  <header class="header">
+  <nav class="navbar">
+    <div class="left-aligned-group">
+      <div class="logo">
+        <img src="image/logo2.png" alt="E-hardware logo">
+        <h1>E-hardware</h1>
+      </div>
+
+      <ul class="nav-links">
+        <li><a href="#home">Home</a></li>
+        <li><a href="#Product">Products</a></li>
+        <li><a href="#about">About</a></li>
+        <li><a href="#Services">Services</a></li>
+        <li><a href="#contact">Contact</a></li>
+        <!-- 🌿 Search bar centered -->
+
+
+      <div class="search-bar-wrapper">
+            <div class="search-bar">
+            <i class="fa fa-search"></i>
+            <input type="text" placeholder="Search products..." />
+
+           <a href="addtocart.html" class="cart-container" id="cart-link" aria-label="View cart">
+              <i class="fa fa-shopping-cart cart-icon"></i>
+             <div class="cart-indicator hidden" id="cart-indicator"></div>
+           </a>
+         </div>
+        </div>
+      </ul>
+    </div>
+
+
+
+    <div class="spacer"></div>
+
+    <!-- Login/Register / User menu -->
+    <div class="auth-buttons">
+      <!-- simple links for guests -->
+      <a href="Login.html" class="login-btn" id="login-text">Login</a>
+      <a href="Register.html" class="register-btn" id="register-link">Register</a>
+
+      <!-- dropdown for logged-in users (hidden for guests) -->
+      <div id="user-menu" class="user-menu" aria-haspopup="true" aria-label="User menu" style="display:none;">
+        <button id="user-toggle" class="user-toggle" aria-expanded="false" aria-controls="user-dropdown">
+          <i class="fa fa-user user-avatar" aria-hidden="true"></i>
+          <span class="user-name">hi</span>
+          <i class="fa fa-caret-down" aria-hidden="true"></i>
+        </button>
+        <div id="user-dropdown" class="user-dropdown" role="menu" aria-hidden="true">
+          <a href="account.html" id="menu-profile" class="menu-item" role="menuitem" tabindex="-1"><strong>My Account</strong></a>
+          <a href="addtocart.html" id="menu-purchase" class="menu-item" role="menuitem" tabindex="-1"><strong>My Purchase</strong></a>
+          <a href="#" id="menu-logout" class="menu-item" role="menuitem" tabindex="-1"><strong>Logout</strong></a>
+        </div>
+      </div>
+    </div>
+  </nav>
+</header>
+  <section class="product-container">
+    <div class="image-gallery">
+      <img id="mainImg" src="" alt="Product">
+      <div class="thumbs"></div>
+    </div>
+
+    <div class="details">
+      <h2 class="product-title"></h2>
+      <p class="rating"></p>
+      <h3 class="price"></h3>
+      <p class="desc"></p>
+      <div class="shipping">
+        <p>🚚 Guaranteed to get by <b>17–18 Oct</b></p>
+        <p>✔ Free & Easy Returns • Product Warranty Included</p>
+      </div>
+      <div class="quantity">
+        <span>Quantity</span>
+        <div class="qty-box">
+          <button onclick="changeQty(-1)">−</button>
+          <input type="text" id="qty" value="1">
+          <button onclick="changeQty(1)">+</button>
+          <span class="available"></span>
+        </div>
+      </div>
+      <div class="buttons">
+        <button class="add-cart">🛒 Add to Cart</button>
+        <button class="buy-now">Buy Now</button>
+      </div>
+      <a href="index.html#Product" class="back">← Back to Products</a>
+    </div>
+  </section>
+
+  <script defer>
+  let currentProduct = null;
+
+  document.addEventListener("DOMContentLoaded", () => {
+    const params = new URLSearchParams(window.location.search);
+    const id = parseInt(params.get("id"));
+    currentProduct = products.find(p => p.id === id);
+
+    if (!currentProduct) {
+      document.body.innerHTML = "<h2>Product not found.</h2>";
+      return;
+    }
+
+    document.querySelector(".product-title").textContent = currentProduct.name;
+    document.querySelector(".price").textContent = "₱" + currentProduct.price.toLocaleString();
+    document.querySelector(".desc").textContent = currentProduct.description;
+    document.querySelector(".rating").textContent = `⭐ ${currentProduct.rating} | ${currentProduct.sold} Sold`;
+    document.querySelector(".available").textContent = `${currentProduct.available} pieces available`;
+
+    const mainImg = document.getElementById("mainImg");
+    const thumbRow = document.querySelector(".thumbs");
+    mainImg.src = currentProduct.images[0];
+    currentProduct.images.forEach(img => {
+      const t = document.createElement("img");
+      t.src = img;
+      t.onclick = () => mainImg.src = img;
+      thumbRow.appendChild(t);
+    });
+
+    // Add cart button handler
+    document.querySelector(".add-cart").addEventListener("click", function() {
+      const qty = parseInt(document.getElementById("qty").value) || 1;
+      addToCart(currentProduct, qty);
+    });
+  });
+
+  function changeQty(delta) {
+    const qty = document.getElementById("qty");
+    let value = parseInt(qty.value) + delta;
+    if (value < 1) value = 1;
+    if (currentProduct && value > currentProduct.available) {
+      value = currentProduct.available;
+    }
+    qty.value = value;
+  }
+
+  function addToCart(product, quantity) {
+    if (!isLoggedIn()) {
+      showToast('Please login or register to add items to cart');
+      return;
+    }
+
+    const cart = readCart();
+    const id = `product-${product.id}`;
+
+    if (cart[id]) {
+      // Add quantity to existing item, up to available limit
+      const newQty = Math.min(cart[id].qty + quantity, product.available);
+      cart[id].qty = newQty;
+    } else {
+      // Add new item
+      cart[id] = {
+        name: product.name,
+        price: product.price,
+        image: product.images[0],
+        qty: Math.min(quantity, product.available)
+      };
+    }
+
+    writeCart(cart);
+    updateIndicator();
+    showToast(`Added ${quantity} ${product.name} to cart`);
+  }
+</script>
+
+</body>
+</html>
