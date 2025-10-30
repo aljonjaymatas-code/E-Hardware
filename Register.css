@@ -8,7 +8,7 @@
 
 body {
   background: linear-gradient(135deg, #2563eb, #1e3a8a);
-  height: 100vh;
+  min-height: 100vh;
   display: flex;
   justify-content: center;
   align-items: center;
@@ -17,18 +17,28 @@ body {
 /* ======== Container ======== */
 .register-container {
   width: 100%;
+  min-height: 100vh;
   display: flex;
   justify-content: center;
   align-items: center;
+  padding: 20px; /* for breathing room on small screens */
+  background: linear-gradient(135deg, #2563eb, #1e3a8a);
 }
 
+/* ======== Register Box ======== */
 .register-box {
-  background: #fff;
+  background: #ffffff;
   width: 420px;
   padding: 2.5rem;
   border-radius: 20px;
-  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.25);
   text-align: center;
+  animation: fadeIn 0.5s ease;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
 }
 
 h1 {
@@ -56,7 +66,8 @@ label {
 }
 
 input {
-  padding: 10px;
+  width: 100%;
+  padding: 10px 40px 10px 10px;
   border-radius: 8px;
   border: 1px solid #ccc;
   margin-top: 5px;
@@ -69,6 +80,83 @@ input:focus {
   box-shadow: 0 0 5px rgba(37, 99, 235, 0.3);
 }
 
+/* ======== Password Container ======== */
+.password-container {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.password-container input {
+  flex: 1;
+}
+
+.show-password {
+  position: absolute;
+  right: 10px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: #555;
+  font-size: 16px;
+}
+
+.show-password:hover {
+  color: #2563eb;
+}
+
+/* ======== LUDS8 Password Rules (aligned like checklist) ======== */
+.password-hint {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: center;
+  background: #fff5f5;
+  padding: 10px 15px;
+  border-radius: 10px;
+  border: 1px solid #fca5a5;
+  font-size: 14px;
+  margin-top: 12px;
+  gap: 6px;
+}
+
+/* Each rule item */
+.password-hint span {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+  font-weight: 500;
+  background: #fee2e2;
+  padding: 6px 10px;
+  border-radius: 6px;
+  border: 1px solid #fca5a5;
+  color: #dc2626; /* red for invalid */
+  transition: all 0.3s ease;
+}
+
+/* Valid = green checklist style */
+.valid {
+  background: #dcfce7;
+  border-color: #86efac;
+  color: #16a34a;
+}
+
+/* Add circle icons using pseudo elements */
+.password-hint span::before {
+  content: "✖";
+  font-size: 14px;
+}
+
+/* When valid, show a checkmark */
+.valid::before {
+  content: "✔";
+}
+
+
+
+
+/* ======== Button ======== */
 .btn-register {
   margin-top: 20px;
   background: #2563eb;

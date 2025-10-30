@@ -6,16 +6,28 @@ function checkAuth() {
 
 // Update UI based on auth state
 function updateAuthUI() {
-    const user = checkAuth();
-    const userMenu = document.getElementById('user-menu');
-    const userNameElement = document.querySelector('.user-name');
-
-    if (user) {
-        if (userMenu) userMenu.style.display = 'block';
-        if (userNameElement) userNameElement.textContent = user.username;
-    } else {
-        if (userMenu) userMenu.style.display = 'none';
+  // Prefer the more complete header render helper if present. That helper
+  // understands both legacy and current storage keys (ehw_user, currentUser)
+  // and performs a robust DOM update. Falling back to the old simple
+  // behaviour keeps backwards compatibility.
+  try{
+    if(typeof ensureHeaderAuthRendered === 'function'){
+      ensureHeaderAuthRendered();
+      return;
     }
+  }catch(e){ /* ignore and fall back */ }
+
+  const raw = localStorage.getItem('ehw_user') || localStorage.getItem('currentUser') || localStorage.getItem('user');
+  const userMenu = document.getElementById('user-menu');
+  const userNameElement = document.querySelector('.user-name');
+  try{
+    if(!raw){ if(userMenu) userMenu.style.display = 'none'; return; }
+    let parsed = null;
+    try{ parsed = JSON.parse(raw); }catch(e){ parsed = raw; }
+    const first = parsed && (parsed.firstName || parsed.name || parsed.username) ? (parsed.firstName || parsed.name || parsed.username) : parsed;
+    if(userMenu) userMenu.style.display = 'inline-block';
+    if(userNameElement && first) userNameElement.textContent = String(first).split(/\s+/)[0];
+  }catch(e){ if(userMenu) userMenu.style.display = 'none'; }
 }
 
 
@@ -67,8 +79,19 @@ function setupLogout() {
     if (menuLogout) {
         menuLogout.addEventListener('click', (e) => {
             e.preventDefault();
-            localStorage.removeItem('currentUser');
-            window.location.reload();
+  try{ localStorage.removeItem('currentUser'); }catch(_){}
+  try{ localStorage.removeItem('ehw_user'); }catch(_){}
+  try{ localStorage.removeItem('user'); }catch(_){ }
+  try{ localStorage.removeItem('ehw_user_v1'); }catch(_){ }
+  try{ localStorage.removeItem('fullname'); }catch(_){ }
+  try{ localStorage.removeItem('name'); }catch(_){ }
+  // Dispatch events so other parts of the app update immediately
+  try{ window.dispatchEvent(new StorageEvent('storage',{ key: 'ehw_user', newValue: null })); }catch(e){}
+  try{ window.dispatchEvent(new CustomEvent('ehw_cart_updated')); }catch(e){}
+  // Immediately hide any visible cart indicators in the DOM
+  try{ document.querySelectorAll('#cart-indicator, .cart-indicator').forEach(el=>{ if(el){ el.textContent=''; el.style.display='none'; } }); }catch(e){}
+  try{ if(typeof updateAuthUI === 'function') updateAuthUI(); }catch(e){}
+  try{ if(typeof updateIndicator === 'function') updateIndicator(); }catch(e){}
         });
     }
 }
@@ -77,10 +100,18 @@ function setupLogout() {
 function updateCartIndicator() {
     const cartIndicator = document.getElementById('cart-indicator');
     if (cartIndicator) {
-        const cart = JSON.parse(localStorage.getItem('cart') || '[]');
-        const itemCount = cart.length;
-        cartIndicator.textContent = itemCount;
-        cartIndicator.classList.toggle('hidden', itemCount === 0);
+    try{
+      const cartObj = JSON.parse(localStorage.getItem('ehw_cart_v1') || '{}') || {};
+  // show unique items count (distinct products with qty>0)
+  const uniqueCount = Object.keys(cartObj).filter(k => cartObj[k] && (cartObj[k].qty || 0) > 0).length || 0;
+  cartIndicator.textContent = uniqueCount ? String(uniqueCount) : '';
+  cartIndicator.classList.toggle('hidden', uniqueCount === 0);
+  cartIndicator.style.display = uniqueCount ? 'inline-block' : 'none';
+    }catch(e){
+      cartIndicator.textContent = '';
+      cartIndicator.classList.add('hidden');
+      cartIndicator.style.display = 'none';
+    }
     }
 }
 
@@ -173,8 +204,8 @@ document.addEventListener("DOMContentLoaded", () => {
           <h3>${p.name}</h3>
           <p class="details">${p.description}</p>
           <div class="btn-group">
-            <button class="add-cart" onclick="addToCart(${p.id})">Add to Cart</button>
-            <button class="view-details" onclick="viewProduct(${p.id})">View Details</button>
+            <button class="add-cart" data-product-id="${p.id}">Add to Cart</button>
+            <button class="view-details" data-product-id="${p.id}">View Details</button>
             <button class="buy-now">Buy Now</button>
           </div>
         </div>
@@ -368,38 +399,35 @@ document.addEventListener('DOMContentLoaded', function(){
       [menuProfile, menuPurchase, menuLogout].forEach(i => { if(i) i.tabIndex = val; });
     }
 
-    // Populate register link text from likely storage keys (fallbacks)
-    const keys = ['ehw_user','user','ehw_user_v1','fullname','name'];
-    let fullname = null;
-    for(const k of keys){
-      const raw = localStorage.getItem(k);
-      if(!raw) continue;
-      try{ const parsed = JSON.parse(raw);
-        if(parsed && typeof parsed === 'object'){
-          fullname = parsed.firstName || parsed.name || parsed.fullname || parsed.fullName || null;
-        } else if(typeof parsed === 'string'){
-          fullname = parsed;
-        }
-      }catch(e){ fullname = raw; }
-      if(fullname) break;
-    }
-    if(fullname && regLink){
-      const first = String(fullname).trim().split(/\s+/)[0];
-      if(first) regLink.textContent = first;
-    }
+    // Populate register link text only when an authenticated user is present.
+    // This prevents legacy keys (e.g. 'fullname' or 'name') from being shown
+    // in the header for guests after logout.
+    try{
+      const authRaw = localStorage.getItem('ehw_user') || localStorage.getItem('currentUser') || localStorage.getItem('user');
+      if(authRaw){
+        let fullname = null;
+        try{
+          const parsed = JSON.parse(authRaw);
+          if(parsed && typeof parsed === 'object') fullname = parsed.firstName || parsed.name || parsed.fullname || parsed.fullName || parsed.username || null;
+          else if(typeof authRaw === 'string') fullname = authRaw;
+        }catch(e){ fullname = authRaw; }
+        if(fullname && regLink){ const first = String(fullname).trim().split(/\s+/)[0]; if(first) regLink.textContent = first; }
+      }
+    }catch(e){ /* ignore */ }
 
     // decide UI for logged-in vs guest
     try{
-      const raw = localStorage.getItem('ehw_user');
+      const raw = localStorage.getItem('ehw_user') || localStorage.getItem('currentUser') || localStorage.getItem('user');
       if(raw){
-          const u = JSON.parse(raw);
+          let u = null;
+          try{ u = JSON.parse(raw); }catch(e){ u = raw; }
           // hide simple login/register anchors
           if(loginText) loginText.style.display = 'none';
           if(regLink) regLink.style.display = 'none';
           // show user menu
           if(userMenu){
             userMenu.style.display = 'inline-block';
-            const first = (u.firstName || u.name || 'hi').toString().trim().split(/\s+/)[0] || 'hi';
+            const first = (u && (u.firstName || u.name || u.username) ? (u.firstName || u.name || u.username) : (typeof u === 'string' ? u : 'hi')).toString().trim().split(/\s+/)[0] || 'hi';
             if(userToggle){
               // Update the username text node and avatar initial without destroying the caret icon
               const nameSpan = userToggle.querySelector('.user-name');
@@ -468,7 +496,22 @@ document.addEventListener('DOMContentLoaded', function(){
     document.addEventListener('click', function(e){ try{ if(userMenu && !userMenu.contains(e.target)){ closeUserMenu(); } }catch(e){} });
 
     // Logout
-    if(menuLogout){ menuLogout.addEventListener('click', function(e){ e.preventDefault(); try{ localStorage.removeItem('ehw_user'); }catch(err){} location.reload(); }); }
+    if(menuLogout){
+      menuLogout.addEventListener('click', function(e){
+        e.preventDefault();
+  try{ localStorage.removeItem('ehw_user'); }catch(err){}
+  try{ localStorage.removeItem('currentUser'); }catch(err){}
+  try{ localStorage.removeItem('user'); }catch(err){}
+  try{ localStorage.removeItem('ehw_user_v1'); }catch(err){}
+  try{ localStorage.removeItem('fullname'); }catch(err){}
+  try{ localStorage.removeItem('name'); }catch(err){}
+        try{ window.dispatchEvent(new StorageEvent('storage',{ key: 'ehw_user', newValue: null })); }catch(e){}
+        try{ window.dispatchEvent(new CustomEvent('ehw_cart_updated')); }catch(e){}
+        try{ document.querySelectorAll('#cart-indicator, .cart-indicator').forEach(el=>{ if(el){ el.textContent=''; el.style.display='none'; } }); }catch(e){}
+        try{ if(typeof updateAuthUI === 'function') updateAuthUI(); }catch(e){}
+        try{ if(typeof updateIndicator === 'function') updateIndicator(); }catch(e){}
+      });
+    }
 
   }catch(e){ /* ignore */ }
 });
@@ -482,12 +525,50 @@ document.addEventListener('DOMContentLoaded', function(){
   const UPDATE_KEY = 'ehw_cart_v1_last_update';
 
   function isLoggedIn(){
-    try{ const raw = localStorage.getItem('ehw_user'); if(!raw) return false; const parsed = JSON.parse(raw); return !!(parsed && (parsed.firstName || parsed.name || parsed.email)); }
-    catch(e){ return !!localStorage.getItem('ehw_user'); }
+    // Consider any known auth storage keys as evidence of a logged-in user.
+    try{
+      const raw = localStorage.getItem('ehw_user') || localStorage.getItem('currentUser') || localStorage.getItem('user');
+      if(!raw) return false;
+      try{ const parsed = JSON.parse(raw); return !!(parsed && (parsed.firstName || parsed.name || parsed.email || parsed.username)); }
+      catch(e){ return true; }
+    }catch(e){
+      return !!(localStorage.getItem('ehw_user') || localStorage.getItem('currentUser') || localStorage.getItem('user'));
+    }
   }
 
-  function readCart(){ try{ return JSON.parse(localStorage.getItem(STORAGE_KEY)) || {}; }catch(e){ return {}; } }
+  function readCart(){
+    try{
+      const raw = JSON.parse(localStorage.getItem(STORAGE_KEY)) || {};
+      // lightweight normalization: numeric keys like '1' -> 'product-1' where possible
+      const normalized = {};
+      Object.keys(raw).forEach(k => {
+        try{
+          if(/^\d+$/.test(k)){
+            const pid = Number(k);
+            const prod = (typeof products !== 'undefined' && Array.isArray(products)) ? products.find(p => p.id === pid) : null;
+            if(prod){
+              normalized[`product-${pid}`] = raw[k];
+              return;
+            }
+          }
+          // preserve existing product-<id> keys and others
+          normalized[k] = raw[k];
+        }catch(e){ normalized[k] = raw[k]; }
+      });
+      return normalized;
+    }catch(e){ return {}; }
+  }
   function writeCart(cart){ try{ localStorage.setItem(STORAGE_KEY, JSON.stringify(cart)); localStorage.setItem(UPDATE_KEY, Date.now()); }catch(e){} }
+  function writeCart(cart){
+    try{
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(cart));
+      localStorage.setItem(UPDATE_KEY, Date.now());
+      // dispatch both storage and custom events so same-tab listeners and
+      // pages restored from bfcache update promptly
+      try{ window.dispatchEvent(new StorageEvent('storage',{ key: STORAGE_KEY, newValue: JSON.stringify(cart) })); }catch(e){}
+      try{ window.dispatchEvent(new CustomEvent('ehw_cart_updated')); }catch(e){}
+    }catch(e){}
+  }
 
   function updateIndicator(){
     const indicator = document.getElementById('cart-indicator');
@@ -501,9 +582,10 @@ document.addEventListener('DOMContentLoaded', function(){
       return;
     }
     const cart = readCart();
-    const total = Object.values(cart).reduce((s,i)=>s + (i.qty||0), 0) || 0;
-    indicator.textContent = total;
-    indicator.style.display = total ? 'inline-block' : 'none';
+    // show unique count (number of distinct items with qty>0)
+    const unique = Object.keys(cart).filter(k => cart[k] && (cart[k].qty || 0) > 0).length || 0;
+    indicator.textContent = unique ? String(unique) : '';
+    indicator.style.display = unique ? 'inline-block' : 'none';
   }
 
   function getToast(){
@@ -520,11 +602,78 @@ document.addEventListener('DOMContentLoaded', function(){
       return;
     }
     const card = btn.closest('.product-card'); if(!card) return;
-    const name = (card.querySelector('h3') && card.querySelector('h3').textContent.trim()) || 'Item';
-    const imgEl = card.querySelector('img'); const image = imgEl ? (imgEl.getAttribute('src') || '') : '';
-    const priceText = (card.querySelector('.price') && card.querySelector('.price').textContent.trim()) || '';
-    const id = name + '|' + (priceText || image || Math.random().toString(36).slice(2,6));
-    const cart = readCart(); if(cart[id]) cart[id].qty = (cart[id].qty||0) + 1; else cart[id] = { name, image, price: priceText, qty: 1 };
+    let name = (card.querySelector('h3') && card.querySelector('h3').textContent.trim()) || 'Item';
+    let imgEl = card.querySelector('img'); let image = imgEl ? (imgEl.getAttribute('src') || '') : '';
+    let priceText = (card.querySelector('.price') && card.querySelector('.price').textContent.trim()) || '';
+    const cart = readCart();
+
+    // Prefer explicit product id (rendered into the card) when present
+    let resolvedKey = null;
+    try{
+      if(btn.dataset && btn.dataset.productId){
+        const pid = Number(btn.dataset.productId);
+        if(!Number.isNaN(pid)){
+          const prod = (typeof products !== 'undefined' && Array.isArray(products)) ? products.find(p => p.id === pid) : null;
+          if(prod){
+            resolvedKey = `product-${pid}`;
+            // canonicalize values from product data
+            priceText = prod.price;
+            image = prod.images && prod.images[0] ? prod.images[0] : image;
+            name = prod.name || name;
+          }
+        }
+      }
+    }catch(e){ /* ignore */ }
+
+    // Try to map this card back to a product id from the products array (fallback)
+    try{
+      if(!resolvedKey){
+        const matched = products.find(p => String(p.name).trim() === name.trim());
+        if(matched && typeof matched.id !== 'undefined'){
+          resolvedKey = `product-${matched.id}`;
+        }
+      }
+    }catch(e){ /* ignore */ }
+
+    // try matching by image filename (some static cards use slightly different titles)
+    if(!resolvedKey && image){
+      try{
+        const file = image.split('/').pop();
+        const matchedByImg = products.find(p => p.images && p.images[0] && p.images[0].split('/').pop() === file);
+        if(matchedByImg && typeof matchedByImg.id !== 'undefined'){
+          resolvedKey = `product-${matchedByImg.id}`;
+        }
+      }catch(e){ /* ignore */ }
+    }
+
+    // fallback key (legacy / for non-standard cards)
+    if(!resolvedKey){
+      // normalize price to numeric where possible
+      let numericPrice = null;
+      try{ const n = Number(String(priceText).replace(/[^0-9.-]+/g,'')); if(!Number.isNaN(n)) numericPrice = n; }catch(e){}
+      const keyFallback = name + '|' + (priceText || image || Math.random().toString(36).slice(2,6));
+      resolvedKey = keyFallback;
+      cart[resolvedKey] = { name, image, price: (numericPrice !== null ? numericPrice : priceText), qty: 1 };
+      writeCart(cart); updateIndicator(); showToast('Added to cart — ' + name);
+      return;
+    }
+
+    if (cart[resolvedKey]){
+      // already added -> notify and do not increase quantity
+      showToast(name + ' is already in your cart');
+      try{ updateIndicator(); }catch(e){}
+      return;
+    }
+
+    // If we resolved a product id, prefer numeric price (from products array) and canonical image
+    let finalPrice = null;
+    try{ const prod = (typeof products !== 'undefined' && Array.isArray(products)) ? products.find(p => `product-${p.id}` === resolvedKey) : null; if(prod) finalPrice = prod.price; }catch(e){}
+    if(finalPrice === null){
+      try{ const n = Number(String(priceText).replace(/[^0-9.-]+/g,'')); if(!Number.isNaN(n)) finalPrice = n; }catch(e){}
+      if(finalPrice === null) finalPrice = priceText;
+    }
+
+    cart[resolvedKey] = { name, image, price: finalPrice, qty: 1 };
     writeCart(cart); updateIndicator(); showToast('Added to cart — ' + name);
   }
 
@@ -578,12 +727,124 @@ document.addEventListener('DOMContentLoaded', function(){
       try{
         if(!e.key) return;
         if(e.key === UPDATE_KEY) updateIndicator();
-        if(e.key === 'ehw_user') updateIndicator();
+        if(e.key === 'ehw_user'){
+          try{ if(typeof updateAuthUI === 'function') updateAuthUI(); }catch(err){}
+          try{ updateIndicator(); }catch(err){}
+        }
       }catch(err){}
     });
   });
 
 })();
+
+// --- Cross-page / same-window cart update helpers ---
+// Notify any indicator updater on this window/tab. Some pages expose either
+// `updateCartIndicator` or `updateIndicator` (different scopes). Call both if present.
+function ehw_notify_cart_listeners(){
+  try{ if(typeof updateCartIndicator === 'function') updateCartIndicator(); }catch(e){}
+  try{ if(typeof updateIndicator === 'function') updateIndicator(); }catch(e){}
+  try{ if(typeof updateAuthUI === 'function') updateAuthUI(); }catch(e){}
+}
+
+// React to custom event and to visibility/navigation events so pages restored from
+// history/back/forward update their UI immediately.
+window.addEventListener('ehw_cart_updated', function(){ ehw_notify_cart_listeners(); });
+window.addEventListener('storage', function(e){ if(!e.key) return; if(e.key === 'ehw_cart_v1' || e.key === 'ehw_cart_v1_last_update' || e.key === 'ehw_user') ehw_notify_cart_listeners(); });
+window.addEventListener('pageshow', function(){ ehw_notify_cart_listeners(); });
+document.addEventListener('visibilitychange', function(){ if(document.visibilityState === 'visible') ehw_notify_cart_listeners(); });
+window.addEventListener('popstate', function(){ ehw_notify_cart_listeners(); });
+
+// Normalize legacy inline onclicks created by templates: convert
+// addToCart(123) -> data-product-id="123" so delegated handlers work
+document.addEventListener('DOMContentLoaded', function(){
+  try{
+    document.querySelectorAll('.add-cart').forEach(btn => {
+      try{
+        if(btn.hasAttribute && btn.hasAttribute('onclick')){
+          const v = btn.getAttribute('onclick') || '';
+          const m = v.match(/addToCart\s*\(\s*(\d+)\s*\)/);
+          if(m){ btn.removeAttribute('onclick'); btn.dataset.productId = m[1]; return; }
+        }
+        // If button has no explicit product id, attempt to resolve from nearby title
+        if(!btn.dataset.productId){
+          const card = btn.closest && btn.closest('.product-card');
+          if(card){
+            const title = card.querySelector && card.querySelector('h3') ? card.querySelector('h3').textContent.trim() : '';
+            if(title){
+              try{ const prod = (typeof products !== 'undefined' && Array.isArray(products)) ? products.find(p => String(p.name).trim() === title) : null; if(prod) btn.dataset.productId = prod.id; }catch(e){}
+            }
+          }
+        }
+      }catch(e){}
+    });
+  }catch(e){}
+});
+
+// When this script writes the cart directly in other places it already dispatches
+// a StorageEvent — but some handlers may not see it (bfcache/history). Ensure
+// we also dispatch the custom event from add-to-cart implementations. We also
+// expose a small helper to dispatch from other scripts if needed.
+function ehw_dispatch_cart_update(){
+  try{ window.dispatchEvent(new CustomEvent('ehw_cart_updated')); }catch(e){}
+  try{ window.dispatchEvent(new StorageEvent('storage',{ key: 'ehw_cart_v1', newValue: localStorage.getItem('ehw_cart_v1') })); }catch(e){}
+}
+
+// Minimal, non-invasive safeguard: ensure header user menu is rendered when a user is present.
+// This runs in addition to existing updateAuthUI to cover cases where the header didn't re-render.
+function ensureHeaderAuthRendered(){
+  try{
+    const raw = localStorage.getItem('ehw_user') || localStorage.getItem('currentUser') || localStorage.getItem('user');
+    const userMenu = document.getElementById('user-menu');
+    const loginText = document.getElementById('login-text');
+    const regLink = document.getElementById('register-link');
+    const userToggle = document.getElementById('user-toggle');
+    if(!raw){
+      // guest: ensure login/register visible, reset texts, and hide user menu
+      if(loginText){ loginText.style.display = 'inline-block'; loginText.setAttribute('href','Login.html'); loginText.textContent = 'Login'; loginText.style.cursor = 'pointer'; }
+      if(regLink){ regLink.style.display = 'inline-block'; regLink.setAttribute('href','Register.html'); regLink.textContent = 'Register'; }
+      if(userMenu) userMenu.style.display = 'none';
+      return;
+    }
+    // if we have a user, try to show the menu
+    let parsed = null;
+    try{ parsed = JSON.parse(raw); }catch(e){ parsed = raw; }
+    const first = (parsed && (parsed.firstName || parsed.name || parsed.fullName)) ? String(parsed.firstName || parsed.name || parsed.fullName).split(/\s+/)[0] : null;
+    if(userMenu) userMenu.style.display = 'inline-block';
+    if(loginText) loginText.style.display = 'none';
+    if(regLink) regLink.style.display = 'none';
+    if(userToggle){
+      const nameSpan = userToggle.querySelector('.user-name');
+      const avatarEl = userToggle.querySelector('.user-avatar');
+      if(nameSpan && first) nameSpan.textContent = first;
+      if(avatarEl && first){ avatarEl.textContent = first.charAt(0).toUpperCase(); avatarEl.classList.remove('fa','fa-user'); }
+    }
+  }catch(e){ /* no-op */ }
+}
+
+// Ensure the mini-cart indicators are hidden for guests. Some pages update the
+// badge independently; this central guard enforces the rule in one place.
+function ensureIndicatorVisibility(){
+  try{
+    const logged = (function(){ try{ return !!(localStorage.getItem('ehw_user')||localStorage.getItem('currentUser')||localStorage.getItem('user')); }catch(e){ return false; } })();
+    if(!logged){
+      document.querySelectorAll('#cart-indicator, .cart-indicator').forEach(el=>{ try{ el.textContent=''; el.style.display='none'; }catch(e){} });
+    } else {
+      try{ if(typeof updateIndicator === 'function') updateIndicator(); }catch(e){}
+    }
+  }catch(e){}
+}
+
+// Wire the guard to common cross-tab and navigation signals
+window.addEventListener('ehw_cart_updated', ensureIndicatorVisibility);
+window.addEventListener('storage', function(e){ try{ if(e && (e.key === 'ehw_user' || e.key === null)) ensureIndicatorVisibility(); }catch(e){} });
+document.addEventListener('DOMContentLoaded', ensureIndicatorVisibility);
+window.addEventListener('pageshow', ensureIndicatorVisibility);
+
+// Run this on common events so the header reliably shows the user UI when logged in.
+document.addEventListener('DOMContentLoaded', ensureHeaderAuthRendered);
+window.addEventListener('pageshow', ensureHeaderAuthRendered);
+window.addEventListener('ehw_cart_updated', ensureHeaderAuthRendered);
+window.addEventListener('storage', function(e){ if(e && e.key === 'ehw_user') ensureHeaderAuthRendered(); });
 
 
 
@@ -1756,9 +2017,30 @@ function viewProduct(id) {
 //   alert(`${product.name} added to your cart!`);
 // }
 
+
+
+// ===== ADD TO CART FUNCTION =====
+
 let addToCartLock = false; // Prevent double-click duplication
 
 function addToCart(id) {
+  // --- Prevent guests from adding to cart ---
+  const _isLoggedIn = (function(){
+    try{
+      const raw = localStorage.getItem('ehw_user') || localStorage.getItem('currentUser') || localStorage.getItem('user') || localStorage.getItem('ehw_user_v1');
+      if(!raw) return false;
+      try{ const parsed = JSON.parse(raw); return !!(parsed && (parsed.firstName || parsed.name || parsed.username || parsed.email)); }catch(e){ return true; }
+    }catch(e){ return false; }
+  })();
+
+  if(!_isLoggedIn){
+    // prefer the site's toast if available, otherwise fallback to alert
+    try{ if(typeof showToast === 'function') { showToast('Please login or register to add items to cart'); } else { alert('Please login or register to add items to cart'); } }catch(e){ try{ alert('Please login or register to add items to cart'); }catch(_){} }
+    // optional: redirect to login page after showing message (commented out)
+    // window.location.href = 'Login.html';
+    return;
+  }
+
   const product = products.find(p => p.id === id);
   if (!product) {
     console.warn('Product not found:', id);
@@ -1777,11 +2059,13 @@ function addToCart(id) {
     console.warn('Error reading cart from storage, resetting cart.');
   }
 
-  const itemKey = String(id);
+  const itemKey = `product-${id}`;
 
   // ✅ Add or update product (no duplicates)
   if (cart[itemKey]) {
-    cart[itemKey].qty += 1;
+    // already added -> notify and do not increase quantity
+    try{ if(typeof showToast === 'function') showToast(product.name + ' is already in your cart'); else alert(product.name + ' is already in your cart'); }catch(e){ try{ alert(product.name + ' is already in your cart'); }catch(_){} }
+    try{ updateIndicator(); }catch(e){}
   } else {
     cart[itemKey] = {
       id: product.id,
@@ -1795,24 +2079,15 @@ function addToCart(id) {
   // ✅ Save updated cart
   try {
     localStorage.setItem(STORAGE_KEY, JSON.stringify(cart));
+    try{ localStorage.setItem(UPDATE_KEY, Date.now()); }catch(e){}
+    // notify other listeners (including in same window) about cart change
+    try{ window.dispatchEvent(new StorageEvent('storage',{ key: STORAGE_KEY, newValue: JSON.stringify(cart) })); }catch(e){}
   } catch (e) {
     console.error('Failed to save cart:', e);
   }
 
-  // ✅ Update cart indicator (no duplicates)
-  const indicator = document.querySelector('.cart-indicator');
-  if (indicator) {
-    const totalItems = Object.values(cart).reduce(
-      (sum, item) => sum + (item.qty || 0),
-      0
-    );
-    indicator.textContent = totalItems > 0 ? totalItems : '';
-    // Make sure the indicator is visible when there are items and hidden when zero
-    try {
-      indicator.style.display = totalItems ? 'inline-block' : 'none';
-      if (totalItems) indicator.classList.remove('hidden'); else indicator.classList.add('hidden');
-    } catch (e) { /* ignore styling errors */ }
-  }
+  // ✅ Update cart indicator (show unique distinct-item count)
+    try{ updateIndicator(); }catch(e){}
 
   // ✅ Optional: simple toast notification (no browser alert)
   showToast(`${product.name} added to cart`);
@@ -1890,3 +2165,85 @@ function restoreDefaultOrder() {
 
 // price-sort is now wired in the main pagination initializer; duplicate wiring removed
 
+// === PRODUCT SEARCH SYSTEM (FULL VERSION) ===
+document.addEventListener("DOMContentLoaded", () => {
+  const searchInput = document.querySelector(".search-bar input");
+  const suggestBox = document.createElement("div");
+  suggestBox.className = "suggest-box hidden";
+  document.querySelector(".search-bar-wrapper").appendChild(suggestBox);
+
+  const productContainer = document.getElementById("product-container");
+  const pagination = document.querySelector(".pagination-buttons");
+
+  if (!searchInput || !productContainer) return;
+
+  // === Load products (replace with your real product array if needed) ===
+  // If products are dynamically rendered, make sure they exist before calling filterProducts()
+  const getAllProducts = () => Array.from(productContainer.querySelectorAll(".product-card"));
+
+  // === Display suggestion dropdown ===
+  function showSuggestions(matches) {
+    if (matches.length === 0) {
+      suggestBox.innerHTML = "<div class='no-result'>No matches found</div>";
+      suggestBox.classList.remove("hidden");
+      return;
+    }
+
+    suggestBox.innerHTML = matches.slice(0, 5).map(match => `
+      <div class="suggest-item">${match.querySelector("h3, h4, h2")?.textContent || "Unnamed Product"}</div>
+    `).join("");
+    suggestBox.classList.remove("hidden");
+  }
+
+  // === Filter Products Function ===
+  function filterProducts(query) {
+    const allProducts = getAllProducts();
+    const lowerQuery = query.toLowerCase();
+    let matches = [];
+
+    allProducts.forEach(card => {
+      const name = card.querySelector("h3, h4, h2")?.textContent.toLowerCase() || "";
+      const visible = name.includes(lowerQuery);
+      card.style.display = visible ? "block" : "none";
+      if (visible) matches.push(card);
+    });
+
+    // Show/hide pagination
+    if (pagination) pagination.style.display = query ? "none" : "flex";
+
+    // Show suggestion dropdown
+    if (query.length > 0) showSuggestions(matches);
+    else suggestBox.classList.add("hidden");
+  }
+
+  // === Handle Input Events ===
+  searchInput.addEventListener("input", e => {
+    const value = e.target.value.trim();
+    filterProducts(value);
+  });
+
+  // === Handle Suggestion Clicks ===
+  suggestBox.addEventListener("click", e => {
+    if (e.target.classList.contains("suggest-item")) {
+      const selected = e.target.textContent;
+      searchInput.value = selected;
+      suggestBox.classList.add("hidden");
+      filterProducts(selected);
+    }
+  });
+
+  // === Close suggestions when clicking outside ===
+  document.addEventListener("click", e => {
+    if (!e.target.closest(".search-bar-wrapper")) suggestBox.classList.add("hidden");
+  });
+});
+
+// Initialize all functionality
+document.addEventListener('DOMContentLoaded', () => {
+    updateAuthUI();
+    setupUserMenu();
+    setupLogout();
+    updateCartIndicator();
+    setupContactForm();
+    handleSearch(); // Initialize search functionality
+});

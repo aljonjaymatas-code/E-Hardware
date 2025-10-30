@@ -1,14 +1,35 @@
+/* === Variables from index.css === */
+:root {
+  /* neutrals */
+  --bg-page: #f5f6f7;        /* page background — gentle off-white */
+  --surface: #ffffff;        /* card / surface background */
+  --muted: #9aa3a8;          /* subdued text / placeholder */
+  --text: #1f2a2b;           /* main text — deep slate (not black) */
+
+  /* accent */
+  --accent-start: #0f7b76;   /* teal start */
+  --accent-end: #67c6bd;     /* teal end (soft) */
+  --accent-plain: #0f7b76;
+
+  /* elevation */
+  --shadow-1: 0 4px 10px rgba(26, 36, 36, 0.06);
+  --shadow-2: 0 10px 24px rgba(26, 36, 36, 0.08);
+
+  /* typography */
+  --font-sans: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
 /* ======== General ======== */
 * {
   margin: 0;
   padding: 0;
   box-sizing: border-box;
-  font-family: 'Poppins', sans-serif;
+  font-family: var(--font-sans);
 }
 
 body {
-  background: linear-gradient(135deg, #1f2937, #111827);
-  height: 100vh;
+  background: var(--bg-page);
+  min-height: 100vh;
   display: flex;
   justify-content: center;
   align-items: center;
@@ -20,24 +41,26 @@ body {
   display: flex;
   justify-content: center;
   align-items: center;
+  padding: 20px;
 }
 
 .login-box {
-  background: #fff;
+  background: var(--surface);
   width: 400px;
   padding: 2rem;
-  border-radius: 15px;
-  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
+  border-radius: 12px;
+  box-shadow: var(--shadow-2);
   text-align: center;
 }
 
 h1 {
-  color: #1f2937;
+  color: var(--text);
   margin-bottom: 10px;
+  font-weight: 800;
 }
 
 .subtext {
-  color: #555;
+  color: var(--muted);
   font-size: 14px;
   margin-bottom: 25px;
 }
@@ -52,21 +75,22 @@ form {
 label {
   font-weight: 600;
   margin-top: 10px;
-  color: #333;
+  color: var(--text);
 }
 
 input {
   padding: 10px;
   border-radius: 8px;
-  border: 1px solid #ccc;
+  border: 1px solid rgba(31,42,43,0.06);
   margin-top: 5px;
   outline: none;
   transition: border 0.3s, box-shadow 0.3s;
+  color: var(--text);
 }
 
 input:focus {
-  border-color: #2563eb;
-  box-shadow: 0 0 5px rgba(37, 99, 235, 0.3);
+  border-color: var(--accent-plain);
+  box-shadow: 0 0 5px rgba(15,123,118,0.2);
 }
 
 /* ======== Password Eye Icon ======== */
@@ -89,47 +113,31 @@ input:focus {
   background: none;
   border: none;
   cursor: pointer;
-  color: #2563eb;
+  color: var(--accent-plain);
   font-size: 18px;
   transition: color 0.3s;
 }
 
 .show-password:hover {
-  color: #1d4ed8;
-}
-
-/* ======== LUDS8 Hint ======== */
-.password-hint {
-  font-size: 13px;
-  color: #888;
-  margin-top: 6px;
-}
-
-.password-hint span.valid {
-  color: green;
-  font-weight: 600;
-}
-
-.password-hint span.invalid {
-  color: red;
-  font-weight: 600;
+  color: var(--accent-start);
 }
 
 /* ======== Buttons ======== */
 .btn-login {
   margin-top: 20px;
-  background: #2563eb;
+  background: linear-gradient(90deg, var(--accent-start), var(--accent-end));
   color: #fff;
   border: none;
   padding: 12px;
-  border-radius: 8px;
+  border-radius: 10px;
   cursor: pointer;
   font-weight: 600;
   transition: 0.3s;
 }
 
 .btn-login:hover {
-  background: #1d4ed8;
+  filter: brightness(1.05);
+  transform: translateY(-2px);
 }
 
 /* ======== Text Links ======== */
@@ -137,11 +145,11 @@ input:focus {
   text-align: center;
   margin-top: 15px;
   font-size: 14px;
-  color: #444;
+  color: var(--muted);
 }
 
 .account-text a {
-  color: #2563eb;
+  color: var(--accent-plain);
   text-decoration: none;
   font-weight: 600;
 }
@@ -154,7 +162,7 @@ input:focus {
   display: inline-block;
   margin-top: 15px;
   font-size: 14px;
-  color: #2563eb;
+  color: var(--accent-plain);
   text-decoration: none;
 }
 

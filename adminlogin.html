@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Admin Login | Hardware Hub</title>
+
+  <!-- Fonts & icons (match other pages) -->
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+
+  <!-- Use the same site CSS as index -->
+  <link rel="stylesheet" href="index.css">
+
+  <style>
+    /* small helper so the login form is centered and looks tidy while using index.css */
+    .admin-login-wrap{ min-height:100vh; display:flex; align-items:center; justify-content:center; padding:40px; }
+    .admin-login-card{ width:420px; background:var(--surface,#fff); border-radius:12px; padding:28px; box-shadow:0 10px 30px rgba(0,0,0,0.08); }
+    .admin-login-card h2{ margin:0 0 8px; font-size:1.4rem; }
+    .admin-login-card p.sub{ margin:0 0 16px; color:rgba(31,42,43,0.7); }
+    .admin-login-card label{ display:block; font-weight:700; margin-top:10px; color:var(--text,#111); }
+    .admin-login-card input{ width:100%; padding:10px 12px; border-radius:8px; border:1px solid rgba(31,42,43,0.08); margin-top:6px; }
+    .admin-login-card .btn{ margin-top:16px; width:100%; padding:12px; border-radius:10px; background:linear-gradient(90deg,var(--accent-start,#0f7b76),var(--accent-end,#67c6bd)); color:#fff; border:0; font-weight:800; cursor:pointer; }
+    .admin-login-card .btn.secondary{ background:#f3f4f6; color:var(--text,#111); border:1px solid rgba(31,42,43,0.06); margin-top:10px; }
+    .admin-login-card .note{ margin-top:12px; font-size:0.92rem; color:rgba(31,42,43,0.64); }
+  </style>
+</head>
+<body>
+  <div class="admin-login-wrap">
+    <div class="admin-login-card">
+      <h2>Admin Sign In</h2>
+      <p class="sub">Sign in with your administrator account to access the dashboard.</p>
+
+      <form id="admin-login-form">
+        <label for="admin-email">Email</label>
+        <input id="admin-email" type="email" placeholder="admin@admin.com" required>
+
+        <label for="admin-password">Password</label>
+        <input id="admin-password" type="password" placeholder="Enter password" required>
+
+        <button type="submit" class="btn">Sign in</button>
+        <button type="button" id="back-btn" class="btn secondary">Back to site</button>
+
+        <p class="note">Default admin for local testing: <strong>admin@admin.com</strong> / <strong>admin123</strong></p>
+      </form>
+    </div>
+  </div>
+
+  <script>
+    (function(){
+      const form = document.getElementById('admin-login-form');
+      const back = document.getElementById('back-btn');
+
+      back.addEventListener('click', () => { window.location.href = 'index.html'; });
+
+      form.addEventListener('submit', (e) => {
+        e.preventDefault();
+        const email = (document.getElementById('admin-email')||{}).value.trim();
+        const password = (document.getElementById('admin-password')||{}).value;
+
+        // Simple client-side check - replace with real auth on server in production
+        if(email === 'admin@admin.com' && password === 'admin123'){
+          try{ localStorage.setItem('ehw_admin', JSON.stringify({ email, isAdmin: true })); }catch(err){}
+          // Redirect to admin dashboard
+          window.location.href = 'admin.html';
+        } else {
+          alert('Invalid admin credentials');
+        }
+      });
+    })();
+  </script>
+</body>
+</html>

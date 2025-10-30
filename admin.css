@@ -1,0 +1,401 @@
+/* Admin-specific styles that extend the index.css theme */
+        body {
+            background: var(--bg-page);
+            color: var(--text);
+            margin: 0;
+            min-height: 100vh;
+            font-family: var(--font-sans);
+        }
+
+        /* --- LAYOUT STRUCTURE (Desktop Only) --- */
+        .app-container {
+            display: flex;
+            min-height: 100vh;
+        }
+
+        /* --- SIDEBAR STYLES --- */
+        .sidebar {
+            width: 16rem;
+            flex-shrink: 0;
+            background-color: var(--surface);
+            padding: 1.5rem;
+            position: sticky;
+            top: 0;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            box-shadow: var(--shadow-1);
+        }
+
+        /* --- MAIN CONTENT & PAGE SWITCHING --- */
+        .main-content {
+            flex-grow: 1;
+            padding: 1.5rem 2rem;
+            overflow-x: hidden;
+        }
+
+        /* Pages are hidden/shown via JS */
+        .page-view:not(.active) {
+            display: none;
+        }
+
+        /* Highlight active link in sidebar */
+        .nav-item.active {
+            background: linear-gradient(90deg, var(--accent-start), var(--accent-end));
+            color: #fff;
+            box-shadow: var(--shadow-2);
+        }
+
+        /* --- SIDEBAR ITEM STYLES --- */
+        .nav-item {
+            display: flex;
+            align-items: center;
+            width: 100%;
+            padding: 0.75rem 1rem;
+            margin-bottom: 0.5rem;
+            border-radius: var(--radius-md);
+            transition: all 0.2s ease;
+            color: var(--text);
+            font-weight: 600;
+            cursor: pointer;
+        }
+        .nav-item:hover:not(.active) {
+            background-color: rgba(15, 123, 118, 0.06);
+            color: var(--accent-plain);
+            transform: translateY(-1px);
+        }
+
+        .nav-item svg {
+            width: 1.25rem;
+            height: 1.25rem;
+            margin-right: 0.75rem;
+            stroke: currentColor;
+            fill: none;
+            stroke-width: 2;
+            stroke-linecap: round;
+            stroke-linejoin: round;
+        }
+
+        /* --- Tab Button Styles --- */
+        #order-tabs .tab-button {
+            padding: 0.5rem 1rem;
+            border-radius: var(--radius-md);
+            font-size: 0.9rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            background-color: var(--surface);
+            color: var(--text);
+            flex-shrink: 0;
+            border: 1px solid rgba(31, 42, 43, 0.06);
+        }
+
+        #order-tabs .tab-button:hover:not(.active) {
+            background: rgba(15, 123, 118, 0.06);
+            color: var(--accent-plain);
+            transform: translateY(-1px);
+        }
+
+        #order-tabs .tab-button.active {
+            background: linear-gradient(90deg, var(--accent-start), var(--accent-end)) !important;
+            color: #fff !important;
+            box-shadow: var(--shadow-2);
+            transform: translateY(-1px);
+        }
+
+
+        /* --- General Card & Table Styles --- */
+        .card {
+            background-color: var(--surface);
+            padding: 1.5rem;
+            border-radius: var(--radius-lg);
+            box-shadow: var(--shadow-1);
+            border: 1px solid rgba(31, 42, 43, 0.06);
+        }
+        .data-table {
+            width: 100%;
+            border-collapse: separate;
+            border-spacing: 0;
+        }
+        .data-table th, .data-table td {
+            padding: 0.75rem 1.5rem;
+            text-align: left;
+            border-bottom: 1px solid rgba(31, 42, 43, 0.06);
+        }
+        .data-table th {
+            color: var(--muted);
+            font-size: 0.75rem;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+        .badge {
+            display: inline-flex;
+            padding: 0.2rem 0.6rem;
+            border-radius: var(--radius-md);
+            font-size: 0.75rem;
+            font-weight: 600;
+            line-height: 1;
+        }
+        .badge-topay { background-color: #fef3c7; color: var(--warning); }
+        .badge-toship { background-color: #e0f2fe; color: var(--info); }
+        .badge-toreceive { background-color: #f3e8ff; color: var(--accent-plain); }
+        .badge-completed { background-color: #d1fae5; color: var(--success); }
+
+        /* Report List Styles */
+        .report-list-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 0.4rem 0;
+            border-bottom: 1px dashed rgba(31, 42, 43, 0.06);
+            font-size: 0.9rem;
+        }
+        .report-list-item:last-child {
+            border-bottom: none;
+        }
+        .report-list-item .rank {
+            font-weight: 700;
+            margin-right: 0.75rem;
+            width: 1.5rem;
+            text-align: center;
+            color: var(--accent-plain);
+        }
+        .report-list-item .sales {
+            font-weight: 600;
+            color: var(--accent-plain);
+        }
+
+        /* Add New Item Form Styles */
+        #inline-add-inventory-form {
+            background: rgba(31, 42, 43, 0.95);
+            padding: 1.5rem;
+            border-radius: var(--radius-lg);
+            margin-bottom: 2rem;
+            box-shadow: var(--shadow-2);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        #inline-add-inventory-form h3 {
+            color: var(--accent-end);
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin-bottom: 1.5rem;
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            align-items: end;
+            margin-bottom: 1rem;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        .form-group label {
+            color: var(--accent-end);
+            font-size: 0.9rem;
+            font-weight: 500;
+        }
+
+        .form-group input {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: var(--radius-md);
+            padding: 0.75rem 1rem;
+            color: #fff;
+            font-size: 1rem;
+            transition: all 0.2s ease;
+        }
+
+        .form-group input:focus {
+            outline: none;
+            border-color: var(--accent-plain);
+            background: rgba(255, 255, 255, 0.1);
+            box-shadow: 0 0 0 3px rgba(15, 123, 118, 0.2);
+        }
+
+        .form-group input::placeholder {
+            color: rgba(255, 255, 255, 0.4);
+        }
+
+        #inline-add-inventory-form button[type="submit"] {
+            background: linear-gradient(90deg, var(--accent-start), var(--accent-end));
+            color: #fff;
+            border: none;
+            padding: 0.75rem 1.5rem;
+            border-radius: var(--radius-md);
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            box-shadow: var(--shadow-1);
+        }
+
+        #inline-add-inventory-form button[type="submit"]:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-2);
+            filter: brightness(1.1);
+        }
+
+        /* Modal Styles */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(15, 123, 118, 0.2);
+            z-index: 50;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            backdrop-filter: blur(4px);
+        }
+        .modal-overlay.hidden {
+            display: none;
+        }
+        .modal-content {
+            background-color: var(--surface);
+            padding: 2rem;
+            border-radius: var(--radius-lg);
+            width: 90%;
+            max-width: 500px;
+            box-shadow: var(--shadow-2);
+            animation: slideIn 0.3s ease-out;
+            border: 1px solid var(--accent-plain);
+        }
+        .modal-content input {
+            width: 100%;
+            padding: 12px 14px;
+            border-radius: var(--radius-md);
+            border: 1px solid rgba(31, 42, 43, 0.06);
+            background: var(--bg-page);
+            color: var(--text);
+            font-size: 0.98rem;
+            transition: all 0.2s ease;
+        }
+        .modal-content input:focus {
+            outline: none;
+            border-color: var(--accent-plain);
+            box-shadow: 0 0 0 3px rgba(15, 123, 118, 0.1);
+        }
+        .modal-content label {
+            display: block;
+            margin-bottom: 6px;
+            font-weight: 600;
+            color: var(--text);
+        }
+        .modal-content button {
+            padding: 10px 20px;
+            border-radius: var(--radius-md);
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        .modal-content button[type="submit"] {
+            background: linear-gradient(90deg, var(--accent-start), var(--accent-end));
+            color: #fff;
+            border: none;
+            box-shadow: var(--shadow-1);
+        }
+        .modal-content button[type="button"] {
+            background: var(--bg-page);
+            color: var(--text);
+            border: 1px solid rgba(31, 42, 43, 0.06);
+        }
+        .modal-content button:hover {
+            transform: translateY(-1px);
+            box-shadow: var(--shadow-2);
+        }
+        @keyframes slideIn {
+            from { opacity: 0; transform: translateY(-20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Action Button Styles */
+        .action-btn {
+            padding: 0.375rem 0.75rem;
+            border-radius: var(--radius-md);
+            font-weight: 600;
+            font-size: 0.875rem;
+            transition: all 0.2s ease;
+            border: none;
+            cursor: pointer;
+        }
+
+        .action-btn[data-action="edit"] {
+            color: var(--accent-plain);
+            background: rgba(15, 123, 118, 0.1);
+        }
+
+        .action-btn[data-action="remove"] {
+            color: var(--danger);
+            background: rgba(224, 93, 93, 0.1);
+        }
+
+        .action-btn:hover {
+            transform: translateY(-1px);
+            filter: brightness(1.1);
+        }
+
+        .action-btn[data-action="edit"]:hover {
+            box-shadow: 0 2px 8px rgba(15, 123, 118, 0.2);
+        }
+
+        .action-btn[data-action="remove"]:hover {
+            box-shadow: 0 2px 8px rgba(224, 93, 93, 0.2);
+        }
+
+        /* Table cell styling */
+        .data-table td {
+            vertical-align: middle;
+        }
+
+        .data-table .price-cell {
+            color: var(--accent-plain);
+            font-weight: 600;
+        }
+
+/* ----------------------
+   Button Styles
+   ---------------------- */
+   
+button,
+.btn {
+  display: inline-block;
+  background: linear-gradient(90deg, var(--accent-start), var(--accent-end));
+  color: #fff;
+  border: none;
+  border-radius: var(--radius-md);
+  padding: 0.75rem 1.5rem;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.25s ease;
+  box-shadow: var(--shadow-1);
+}
+
+button:hover,
+.btn:hover {
+  background: linear-gradient(90deg, var(--accent-end), var(--accent-start));
+  box-shadow: var(--shadow-2);
+  transform: translateY(-1px);
+}
+
+button:active,
+.btn:active {
+  transform: translateY(0);
+  box-shadow: var(--shadow-1);
+  opacity: 0.9;
+}
+
+button:disabled,
+.btn:disabled {
+  background: var(--muted);
+  cursor: not-allowed;
+  box-shadow: none;
+  opacity: 0.6;
+}

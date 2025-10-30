@@ -1009,3 +1009,37 @@ body{
 .user-menu:focus-within .user-dropdown {
   display: block;
 }
+
+.suggest-box {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  width: 100%;
+  background: white;
+  border: 1px solid #ddd;
+  border-radius: 10px;
+  margin-top: 5px;
+  box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+  max-height: 200px;
+  overflow-y: auto;
+  z-index: 100;
+}
+
+.suggest-box.hidden { display: none; }
+
+.suggest-item {
+  padding: 10px 14px;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.suggest-item:hover {
+  background: #f1f5f9;
+}
+
+.no-result {
+  padding: 10px;
+  color: #888;
+  text-align: center;
+  font-style: italic;
+}

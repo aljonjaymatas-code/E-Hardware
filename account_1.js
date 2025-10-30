@@ -145,18 +145,9 @@ document.addEventListener("DOMContentLoaded", () => {
         if (menuLogout) {
           menuLogout.addEventListener('click', function (ev) {
             ev.preventDefault();
-            try{ localStorage.removeItem('ehw_user'); }catch(_){ }
-            try{ localStorage.removeItem('currentUser'); }catch(_){ }
-            try{ localStorage.removeItem('user'); }catch(_){ }
-            try{ localStorage.removeItem('ehw_user_v1'); }catch(_){ }
-            try{ localStorage.removeItem('fullname'); }catch(_){ }
-            try{ localStorage.removeItem('name'); }catch(_){ }
-            // notify other parts of the app so the header and indicator update
-            try{ window.dispatchEvent(new StorageEvent('storage',{ key: 'ehw_user', newValue: null })); }catch(e){}
-            try{ window.dispatchEvent(new CustomEvent('ehw_cart_updated')); }catch(e){}
-            try{ document.querySelectorAll('#cart-indicator, .cart-indicator').forEach(el=>{ if(el){ el.textContent=''; el.style.display='none'; } }); }catch(e){}
-            try{ if(typeof window.updateAuthUI === 'function') window.updateAuthUI(); }catch(e){}
-            try{ if(typeof window.updateCartIndicator === 'function') window.updateCartIndicator(); }catch(e){}
+            try { localStorage.removeItem('ehw_user'); } catch (err) { }
+            // reload to reflect guest UI
+            window.location.reload();
           });
         }
       } catch (err) { /* ignore header wiring errors */ }
@@ -220,6 +211,42 @@ document.addEventListener("DOMContentLoaded", () => {
       if (target) target.classList.add("active");
     });
   });
+
+  // If the page was loaded with a hash (e.g. account.html#purchase-section),
+  // activate that section and update the sidebar menu state. This makes
+  // header links like "My Purchase" (which point to account.html#purchase-section)
+  // open the correct tab on the account page.
+  (function activateSectionFromHash() {
+    try {
+      const hash = (window.location.hash || '').trim();
+      if (!hash) return;
+      const id = hash.replace('#', '');
+      const target = document.getElementById(id);
+      if (!target) return;
+
+      // show the requested section
+      sections.forEach(sec => sec.classList.remove('active'));
+      target.classList.add('active');
+
+      // update sidebar/menu buttons
+      document.querySelectorAll('.menu-btn, .submenu-btn').forEach(b => b.classList.remove('active'));
+      const btn = document.querySelector(`[data-section="${id}"]`);
+      if (btn) {
+        btn.classList.add('active');
+        if (btn.classList.contains('submenu-btn')) {
+          // ensure accordion is expanded when a submenu item is requested
+          if (accordionHeader) accordionHeader.classList.add('active');
+          if (submenu && !submenu.classList.contains('expanded')) submenu.classList.add('expanded');
+          accordionHeader?.setAttribute('aria-expanded', 'true');
+        } else if (btn !== accordionHeader) {
+          // collapse submenu for other top-level selections
+          if (submenu) submenu.classList.remove('expanded');
+          if (accordionHeader) { accordionHeader.classList.remove('active'); accordionHeader.setAttribute('aria-expanded', 'false'); }
+        }
+        try { btn.focus({ preventScroll: true }); } catch (e) { /* ignore focus errors */ }
+      }
+    } catch (err) { /* ignore any parsing errors */ }
+  })();
 
   /* =====================================================
      🔹 PROFILE EDITABLE FIELDS (EMAIL, PHONE, DOB)
@@ -450,4 +477,345 @@ document.addEventListener("DOMContentLoaded", () => {
       btn.classList.add("active");
     });
   });
+
+  /* =====================================================
+     🔹 ADD / REMOVE MAP EMBED (Add Location)
+  ====================================================== */
+  const addLocationBtn = document.querySelector('.add-location-btn');
+  if (addLocationBtn) {
+    const mapPreviewWrapperClass = 'map-embed-wrapper';
+    const mapEmbedInput = document.getElementById('modal-map-embed');
+
+    function extractIframeHtml(val) {
+      if (!val) return null;
+      const trimmed = val.trim();
+      // match the full iframe tag (non-greedy)
+      const match = trimmed.match(/<iframe[\s\S]*?<\/iframe>/i);
+      return match ? match[0] : null;
+    }
+
+    addLocationBtn.addEventListener('click', (e) => {
+      e.preventDefault();
+      const container = addLocationBtn.closest('.map-placeholder');
+      if (!container) return;
+      const existing = container.querySelector('.' + mapPreviewWrapperClass);
+      if (existing) {
+        existing.remove();
+        addLocationBtn.innerHTML = '<i class="fa fa-plus" aria-hidden="true"></i> Add Location';
+        return;
+      }
+
+      const raw = mapEmbedInput?.value || '';
+      const iframeHtml = extractIframeHtml(raw);
+      if (!iframeHtml) {
+        const note = document.createElement('div');
+        note.className = 'map-embed-wrapper map-note';
+        note.style.marginTop = '8px';
+        note.textContent = 'Please paste a valid <iframe> embed HTML in the box above, then click Add Location to preview.';
+        container.appendChild(note);
+        setTimeout(() => note.remove(), 3000);
+        return;
+      }
+
+      const previewHtml = `<div class="${mapPreviewWrapperClass}" style="margin-top:8px;">${iframeHtml}</div>`;
+      container.insertAdjacentHTML('beforeend', previewHtml);
+      addLocationBtn.innerHTML = '<i class="fa fa-times" aria-hidden="true"></i> Remove Location';
+    });
+  }
+
+  /* =====================================================
+     🔹 ADDRESS STORAGE, RENDERING & SUBMIT HANDLER
+  ====================================================== */
+  const addressesKey = 'ehw_addresses';
+  const addressesListContainer = document.querySelector('.addresses-list-container');
+
+  function escapeHtml(str) {
+    return String(str || '').replace(/[&<>\"']/g, function (m) {
+      return ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[m];
+    });
+  }
+
+  // Embed-only mode: we will store iframe HTML (mapEmbed) when present in modal
+
+  function renderAddresses() {
+    const container = addressesListContainer;
+    if (!container) return;
+
+    let addresses = [];
+    try { addresses = localStorage.getItem(addressesKey) ? JSON.parse(localStorage.getItem(addressesKey)) : []; } catch (e) { addresses = []; }
+
+    // clear existing
+    container.innerHTML = '';
+
+    if (!addresses.length) {
+      container.innerHTML = `
+        <div class="no-addresses">
+          <div class="map-icon" aria-hidden="true"><i class="fa fa-map-marker"></i></div>
+          <p>You don't have addresses yet.</p>
+        </div>
+      `;
+      return;
+    }
+
+    const list = document.createElement('div');
+    list.className = 'addresses-list';
+
+    addresses.forEach((a, idx) => {
+      const card = document.createElement('div');
+      card.className = 'address-card';
+      // card layout: left = info/actions, right = map preview container
+      card.innerHTML = `
+      <div class="address-row" style="display:flex;gap:12px;align-items:flex-start;">
+          <div class="address-info" style="flex:1;">
+            <div class="address-card-header">
+              <strong>${escapeHtml(a.fullname)}</strong>
+              ${a.default ? '<span class="default-badge">Default</span>' : ''}
+            </div>
+            <div class="address-lines">
+              <div class="address-line">${escapeHtml(a.region)}</div>
+              <div class="address-line">${escapeHtml(a.street || '')}</div>
+              <div class="address-line">Postal: ${escapeHtml(a.postal || '')}</div>
+              <div class="address-line">Phone: ${escapeHtml(a.phone)}</div>
+              <div class="address-label">${escapeHtml(a.label || '')}</div>
+            </div>
+            <div class="address-actions">
+              <button class="view-map-btn" data-idx="${idx}">${a.mapEmbed ? 'View Map' : 'No Map'}</button>
+              <button class="edit-address-btn" data-idx="${idx}">Edit</button>
+              <button class="delete-address-btn" data-idx="${idx}">Delete</button>
+            </div>
+          </div>
+          <div class="address-map" style="width:320px;display:none;">
+            <!-- map iframe will be inserted here when user clicks View Map -->
+          </div>
+        </div>
+      `;
+      list.appendChild(card);
+    });
+
+    container.appendChild(list);
+
+    // attach delete handlers
+    container.querySelectorAll('.delete-address-btn').forEach(btn => {
+      btn.addEventListener('click', (e) => {
+        const idx = Number(btn.dataset.idx);
+        if (!Number.isFinite(idx)) return;
+        addresses.splice(idx, 1);
+        localStorage.setItem(addressesKey, JSON.stringify(addresses));
+        renderAddresses();
+      });
+    });
+
+    // attach view-map handlers (embed-only)
+    container.querySelectorAll('.view-map-btn').forEach(btn => {
+      btn.addEventListener('click', (e) => {
+        const idx = Number(btn.dataset.idx);
+        if (!Number.isFinite(idx)) return;
+        const card = btn.closest('.address-card');
+        if (!card) return;
+        const mapContainer = card.querySelector('.address-map');
+        const addr = addresses[idx];
+        if (!addr || !addr.mapEmbed) {
+          alert('No map embed saved for this address.');
+          return;
+        }
+
+        // toggle
+        if (mapContainer.innerHTML.trim()) {
+          mapContainer.innerHTML = '';
+          mapContainer.style.display = 'none';
+          btn.textContent = 'View Map';
+          return;
+        }
+
+        // insert saved iframe HTML directly
+        mapContainer.innerHTML = addr.mapEmbed;
+        mapContainer.style.display = 'block';
+        btn.textContent = 'Hide Map';
+      });
+    });
+  }
+
+  // handle new address submit
+  const newAddressForm = document.getElementById('new-address-form');
+  if (newAddressForm) {
+    newAddressForm.addEventListener('submit', (e) => {
+      e.preventDefault();
+
+      const fullname = document.getElementById('modal-fullname')?.value.trim() || '';
+      const phone = document.getElementById('modal-phone')?.value.trim() || '';
+      const region = document.getElementById('modal-region-province')?.value.trim() || '';
+      const postal = document.getElementById('modal-postal-code')?.value.trim() || '';
+      const street = document.getElementById('modal-street-address')?.value.trim() || '';
+      const labelEl = document.querySelector('.label-btn.active');
+      const label = labelEl ? labelEl.textContent.trim() : '';
+      const isDefault = !!document.getElementById('default-address')?.checked;
+
+      if (!fullname) { alert('Please enter full name.'); return; }
+      if (!phone) { alert('Please enter phone number.'); return; }
+      if (!region) { alert('Please choose a region/province/city/barangay.'); return; }
+      if (!postal) { alert('Please enter postal code.'); return; }
+
+      let addressesArr = [];
+      try { addressesArr = localStorage.getItem(addressesKey) ? JSON.parse(localStorage.getItem(addressesKey)) : []; } catch (err) { addressesArr = []; }
+
+      if (isDefault) {
+        addressesArr = addressesArr.map(a => ({ ...a, default: false }));
+      }
+
+      // if user previewed an embed in the modal, capture that iframe HTML
+      let mapEmbedHtml = '';
+      try {
+        const modalIframe = document.querySelector('#address-modal .map-placeholder .map-embed-wrapper iframe');
+        if (modalIframe) mapEmbedHtml = modalIframe.outerHTML;
+      } catch (err) { mapEmbedHtml = ''; }
+
+      addressesArr.push({ fullname, phone, region, postal, street, label, mapEmbed: mapEmbedHtml, default: !!isDefault, createdAt: new Date().toISOString() });
+      localStorage.setItem(addressesKey, JSON.stringify(addressesArr));
+
+      // remove modal preview if present
+      try {
+        const modalMapPlaceholder = document.querySelector('#address-modal .map-placeholder');
+        modalMapPlaceholder?.querySelector('.map-embed-wrapper')?.remove();
+      } catch (err) {}
+
+      // reset form, restore label button state
+      newAddressForm.reset();
+      document.querySelectorAll('.label-btn').forEach(b => b.classList.remove('active'));
+      const firstLabel = document.querySelector('.label-btn');
+      if (firstLabel) firstLabel.classList.add('active');
+
+      // close modal and re-render
+      try { closeModal(); } catch (err) {}
+      renderAddresses();
+      alert('Address added successfully.');
+    });
+  }
+
+  // initial render of addresses saved in localStorage
+  renderAddresses();
 });
+
+
+
+
+
+
+
+
+
+
+radawd
+
+document.addEventListener("DOMContentLoaded", () => {
+  const PURCHASE_KEY = 'ehw_purchases_v1';
+  let purchases = [];
+
+  try {
+    purchases = JSON.parse(localStorage.getItem(PURCHASE_KEY)) || [];
+  } catch {
+    purchases = [];
+  }
+
+  const noOrders = document.querySelector('.no-orders');
+  const tabs = document.querySelectorAll('.tab');
+  const tabSections = document.querySelectorAll('.tab-section');
+
+  // 🧹 Helper to save updated list
+  const savePurchases = () => {
+    localStorage.setItem(PURCHASE_KEY, JSON.stringify(purchases));
+  };
+
+  // 🧩 Function to delete an order
+  const deleteOrder = (id) => {
+    purchases = purchases.filter(p => p.id !== id);
+    savePurchases();
+    renderAllTabs();
+  };
+
+  // 🎨 Render orders by status
+  const renderOrders = (status, containerId) => {
+    const container = document.getElementById(containerId);
+    if (!container) return;
+
+    // Show all purchases for 'All' tab and show specific status for other tabs
+    const filtered = 
+      status === 'All' ? [...purchases] : purchases.filter(p => p.status === status);
+
+    if (filtered.length === 0) {
+      container.innerHTML = '<p style="text-align:center;color:gray;">No orders here.</p>';
+      return;
+    }
+
+    container.innerHTML = filtered.map(p => `
+      <div class="order-item" data-id="${p.id}" style="display:flex;align-items:center;justify-content:space-between;gap:16px;margin-bottom:16px;background:var(--bg-white);padding:12px;border-radius:8px;box-shadow:var(--shadow-1);">
+        <div style="display:flex;align-items:center;gap:16px;">
+          <img src="${p.image}" alt="${p.name}" style="width:70px;height:70px;object-fit:cover;border-radius:8px;">
+          <div>
+            <h4 style="margin:0 0 4px;font-size:1rem;color:var(--text-dark);">${p.name}</h4>
+            <p style="margin:0;color:var(--accent-start);font-weight:600;">₱${p.price.toLocaleString()}</p>
+            <small style="color:var(--text-muted);">Status: <b>${p.status}</b></small><br>
+            <small style="color:var(--text-muted);">Date: ${new Date(p.date).toLocaleDateString()}</small>
+          </div>
+        </div>
+        <button class="delete-btn" style="background:#dc2626;color:white;border:none;padding:6px 12px;border-radius:6px;cursor:pointer;">
+          Delete
+        </button>
+      </div>
+    `).join('');
+
+    // 🗑️ Hook up delete buttons
+    container.querySelectorAll('.delete-btn').forEach(btn => {
+      btn.addEventListener('click', (e) => {
+        const id = parseInt(e.target.closest('.order-item').dataset.id);
+        if (confirm('Are you sure you want to delete this order?')) {
+          deleteOrder(id);
+        }
+      });
+    });
+  };
+
+  // 🔄 Render all tabs
+  const renderAllTabs = () => {
+    // First render the "All" tab which should show everything
+    renderOrders('All', 'tab-all');
+    
+    // Then render each status-specific tab
+    renderOrders('To Pay', 'tab-to-pay');
+    renderOrders('To Ship', 'tab-to-ship');
+    renderOrders('To Receive', 'tab-to-receive');
+    renderOrders('Completed', 'tab-completed');
+    renderOrders('Cancelled', 'tab-cancelled');
+    renderOrders('Return Refund', 'tab-return-refund');
+
+    // Toggle "no orders" message
+    if (purchases.length === 0) {
+      noOrders.style.display = 'block';
+    } else {
+      noOrders.style.display = 'none';
+    }
+  };
+
+  // 🧭 Handle tab switching
+  tabs.forEach(tab => {
+    tab.addEventListener('click', () => {
+      const target = tab.dataset.target;
+      tabs.forEach(t => t.classList.remove('active'));
+      tabSections.forEach(sec => sec.classList.add('hidden'));
+      tab.classList.add('active');
+      document.getElementById(target).classList.remove('hidden');
+    });
+  });
+
+  // 🚀 Initial render
+  renderAllTabs();
+
+  // 🟢 Auto-open correct tab after Buy Now
+  const lastTab = sessionStorage.getItem('purchaseTab');
+  if (lastTab) {
+    const tabButton = document.querySelector(`[data-target="${lastTab}"]`);
+    if (tabButton) tabButton.click();
+    sessionStorage.removeItem('purchaseTab');
+  }
+});
+
+
