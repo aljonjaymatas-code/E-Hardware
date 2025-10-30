@@ -316,6 +316,8 @@ document.addEventListener("DOMContentLoaded", () => {
     }, 60);
   }
 
+  
+
   // --- CATEGORY FILTER (by page) ---
   const sortSelect = document.getElementById("sort");
   let currentCategory = 'All';
@@ -1925,6 +1927,11 @@ const products = [
   // Add the rest of your 40 products here
 ];
 
+
+
+
+// ===== SORTING FUNCTIONS =====
+
 // ===== SHOW PRODUCTS ON INDEX.HTML =====
 document.addEventListener("DOMContentLoaded", () => {
   const container = document.getElementById("product-container");
@@ -2163,87 +2170,368 @@ function restoreDefaultOrder() {
   window.location.reload();
 }
 
+
+
+
 // price-sort is now wired in the main pagination initializer; duplicate wiring removed
 
-// === PRODUCT SEARCH SYSTEM (FULL VERSION) ===
-document.addEventListener("DOMContentLoaded", () => {
-  const searchInput = document.querySelector(".search-bar input");
-  const suggestBox = document.createElement("div");
-  suggestBox.className = "suggest-box hidden";
-  document.querySelector(".search-bar-wrapper").appendChild(suggestBox);
+// SEARCH FUNCTIONALITY =======================
 
-  const productContainer = document.getElementById("product-container");
-  const pagination = document.querySelector(".pagination-buttons");
 
-  if (!searchInput || !productContainer) return;
 
-  // === Load products (replace with your real product array if needed) ===
-  // If products are dynamically rendered, make sure they exist before calling filterProducts()
-  const getAllProducts = () => Array.from(productContainer.querySelectorAll(".product-card"));
+function setupSearch() {
+    const searchInput = document.querySelector('.search-bar input');
+    if (!searchInput) return;
 
-  // === Display suggestion dropdown ===
-  function showSuggestions(matches) {
-    if (matches.length === 0) {
-      suggestBox.innerHTML = "<div class='no-result'>No matches found</div>";
-      suggestBox.classList.remove("hidden");
-      return;
-    }
-
-    suggestBox.innerHTML = matches.slice(0, 5).map(match => `
-      <div class="suggest-item">${match.querySelector("h3, h4, h2")?.textContent || "Unnamed Product"}</div>
-    `).join("");
-    suggestBox.classList.remove("hidden");
-  }
-
-  // === Filter Products Function ===
-  function filterProducts(query) {
-    const allProducts = getAllProducts();
-    const lowerQuery = query.toLowerCase();
-    let matches = [];
-
-    allProducts.forEach(card => {
-      const name = card.querySelector("h3, h4, h2")?.textContent.toLowerCase() || "";
-      const visible = name.includes(lowerQuery);
-      card.style.display = visible ? "block" : "none";
-      if (visible) matches.push(card);
+    searchInput.addEventListener('input', (e) => {
+        const searchTerm = e.target.value.toLowerCase().trim();
+        
+        // Scroll to Product section when starting to type
+        if (searchTerm.length === 1) {
+            const productSection = document.getElementById('Product');
+            if (productSection) {
+                const headerHeight = document.querySelector('.header')?.offsetHeight || 0;
+                const scrollPosition = productSection.offsetTop - headerHeight - 20;
+                window.scrollTo({
+                    top: scrollPosition,
+                    behavior: 'smooth'
+                });
+            }
+        }
+        
+        // Process search
+        filterProductsByLetter(searchTerm);
     });
 
-    // Show/hide pagination
-    if (pagination) pagination.style.display = query ? "none" : "flex";
+    // Hide results when clicking outside
+    document.addEventListener('click', (e) => {
+        if (!e.target.closest('.search-bar')) {
+            hideSearchResults();
+        }
+    });
+}
 
-    // Show suggestion dropdown
-    if (query.length > 0) showSuggestions(matches);
-    else suggestBox.classList.add("hidden");
-  }
+function filterProductsByLetter(term) {
+    const allPages = document.querySelectorAll('.product-page');
+    const firstPage = document.querySelector('.page-1');
+    const paginationButtons = document.querySelector('.pagination-buttons');
+    
+    if (!firstPage) return;
 
-  // === Handle Input Events ===
-  searchInput.addEventListener("input", e => {
-    const value = e.target.value.trim();
-    filterProducts(value);
-  });
-
-  // === Handle Suggestion Clicks ===
-  suggestBox.addEventListener("click", e => {
-    if (e.target.classList.contains("suggest-item")) {
-      const selected = e.target.textContent;
-      searchInput.value = selected;
-      suggestBox.classList.add("hidden");
-      filterProducts(selected);
+    // If search is empty, restore original pagination
+    if (!term) {
+        allPages.forEach((page, index) => {
+            page.style.display = index === 0 ? '' : 'none';
+            // Move products back to their original pages
+            if (index > 0) {
+                const products = page.querySelectorAll('.product-card');
+                products.forEach(product => {
+                    product.style.display = '';
+                    if (product.parentElement !== page.querySelector('.product-grid')) {
+                        page.querySelector('.product-grid').appendChild(product);
+                    }
+                });
+            }
+        });
+        currentPage = 1;
+        paginationButtons.style.display = '';
+        updatePaginationButtons();
+        return;
     }
-  });
 
-  // === Close suggestions when clicking outside ===
-  document.addEventListener("click", e => {
-    if (!e.target.closest(".search-bar-wrapper")) suggestBox.classList.add("hidden");
-  });
+    // Hide pagination buttons during search
+    paginationButtons.style.display = 'none';
+    
+    // Show only first page for search results
+    allPages.forEach((page, index) => {
+        if (index === 0) {
+            page.style.display = '';
+        } else {
+            page.style.display = 'none';
+        }
+    });
+
+    // Get the first page's grid to hold all matching products
+    const firstPageGrid = firstPage.querySelector('.product-grid');
+    let foundMatches = false;
+
+    // Search through all products in all pages
+    allPages.forEach(page => {
+        const products = page.querySelectorAll('.product-card');
+        products.forEach(product => {
+            const productName = product.querySelector('h3')?.textContent || '';
+            const matches = productName.toLowerCase().includes(term.toLowerCase());
+            
+            if (matches) {
+                foundMatches = true;
+                product.style.display = '';
+                // Move matching product to first page if it's not already there
+                if (page !== firstPage) {
+                    firstPageGrid.appendChild(product);
+                }
+            } else {
+                product.style.display = 'none';
+            }
+        });
+    });
+}
+
+function displaySearchResults(results) {
+    let resultsContainer = document.querySelector('.search-results');
+    if (!resultsContainer) {
+        resultsContainer = document.createElement('div');
+        resultsContainer.className = 'search-results';
+        document.querySelector('.search-bar').appendChild(resultsContainer);
+    }
+
+    if (results.length === 0) {
+        resultsContainer.innerHTML = '<div class="no-results">No products found</div>';
+        resultsContainer.style.display = 'block';
+        return;
+    }
+
+    const html = results.map(product => `
+        <a href="#Product" class="search-result-item" data-product-id="${product.id}">
+            <img src="${product.image}" alt="${product.name}">
+            <div class="result-details">
+                <div class="result-name">${product.name}</div>
+                <div class="result-price">₱${product.price}</div>
+            </div>
+        </a>
+    `).join('');
+
+    resultsContainer.innerHTML = html;
+    resultsContainer.style.display = 'block';
+
+    // Add click handlers for search results
+    resultsContainer.querySelectorAll('.search-result-item').forEach(item => {
+        item.addEventListener('click', () => {
+            const productId = item.dataset.productId;
+            // Here you can add logic to show the product details
+            hideSearchResults();
+            document.querySelector('.search-bar input').value = '';
+        });
+    });
+}
+
+function hideSearchResults() {
+    const resultsContainer = document.querySelector('.search-results');
+    if (resultsContainer) {
+        resultsContainer.style.display = 'none';
+    }
+}
+
+// Store original products for filtering
+let originalProducts = [];
+
+// Initialize search functionality
+function setupSearchBar() {
+    try {
+        const wrapper = document.querySelector('.search-bar-wrapper');
+        if (!wrapper) return;
+        
+        const input = wrapper.querySelector('input[type="text"]');
+        const icon = wrapper.querySelector('.fa-search');
+        if (!input) return;
+
+        // Store all products initially
+        originalProducts = Array.from(document.querySelectorAll('.product-item, .product'))
+            .map(el => ({
+                element: el,
+                name: el.querySelector('.product-title, h3, h4')?.textContent || '',
+                description: el.querySelector('.product-description')?.textContent || ''
+            }));
+
+        // Enter key -> search
+        input.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter') {
+                e.preventDefault();
+                doSearch(input.value);
+            }
+        });
+
+        // Click search icon
+        if (icon) {
+            icon.style.cursor = 'pointer';
+            icon.addEventListener('click', () => doSearch(input.value));
+        }
+
+        // Auto-run when a single letter is typed
+        input.addEventListener('input', () => {
+            const v = String(input.value || '').trim();
+            if (v.length === 1) doSearch(v);
+            if (v.length === 0) {
+                // restore full listing
+                showAllProducts();
+            }
+        });
+
+        // Check URL for search query
+        try {
+            const params = new URLSearchParams(window.location.search);
+            const q = params.get('q');
+            if (q) {
+                input.value = q;
+                doSearch(q);
+            }
+        } catch (e) {}
+    } catch (e) {
+        console.log('Search setup error:', e);
+    }
+}
+
+// Perform the search
+function doSearch(term) {
+    term = String(term || '').trim();
+    if (!term) {
+        showAllProducts();
+        return;
+    }
+
+    filterProductsByQuery(term);
+
+    // Scroll to product section
+    const productSection = document.getElementById('Product');
+    if (productSection) {
+        const header = document.querySelector('.header');
+        const headerHeight = header ? header.offsetHeight : 0;
+        const rect = productSection.getBoundingClientRect();
+        const scrollTop = window.pageYOffset + rect.top - headerHeight - 8;
+        window.scrollTo({ top: scrollTop, behavior: 'smooth' });
+    }
+
+    // Update URL with search term
+    try {
+        const url = new URL(window.location.href);
+        url.searchParams.set('q', term);
+        history.replaceState(null, '', url.toString());
+    } catch (e) {}
+}
+
+// Filter products based on search query
+function filterProductsByQuery(term) {
+    const q = String(term || '').toLowerCase().trim();
+    if (!q) {
+        showAllProducts();
+        return;
+    }
+
+    originalProducts.forEach(product => {
+        if (q.length === 1) {
+            // Single letter - match start of product name
+            const name = String(product.name || '').trim();
+            const firstChar = name.charAt(0).toLowerCase();
+            product.element.style.display = firstChar === q ? '' : 'none';
+        } else {
+            // Multiple letters - match anywhere in name
+            const name = String(product.name || '').toLowerCase();
+            product.element.style.display = name.includes(q) ? '' : 'none';
+        }
+    });
+}
+
+// Show all products
+function showAllProducts() {
+    originalProducts.forEach(product => {
+        product.element.style.display = '';
+    });
+    try {
+        const url = new URL(window.location.href);
+        url.searchParams.delete('q');
+        history.replaceState(null, '', url.toString());
+    } catch (e) {}
+}
+
+
+// Function to filter and show/hide products
+function filterProducts(searchTerm) {
+    // Select all product elements with class 'item' or that contain 'product' in class name
+    const products = document.querySelectorAll('.product-item, .product');
+    
+    products.forEach(product => {
+        // Look specifically for the product name/title only
+        const productName = product.querySelector('h3, h4, .product-title, .item-title')?.textContent || '';
+        
+        // Check if the product name contains the search term (case insensitive)
+        const matches = productName.toLowerCase().includes(searchTerm.toLowerCase());
+        
+        // Show/hide based on match
+        product.style.display = searchTerm === '' || matches ? '' : 'none';
+    });
+
+    searchInput.addEventListener('input', function(e) {
+        const searchTerm = e.target.value.toLowerCase().trim();
+        
+        // Get all product elements
+        const products = document.querySelectorAll('.product-card');
+        let matches = [];
+        
+        products.forEach(product => {
+            const title = (product.querySelector('.product-title')?.textContent || '').toLowerCase();
+            const category = (product.getAttribute('data-category') || '').toLowerCase();
+            
+            // Check if product matches search (case insensitive)
+            // Now works with any length of search term, including single letters
+            if (title.includes(searchTerm) || category.includes(searchTerm)) {
+                matches.push({
+                    title: product.querySelector('.product-title')?.textContent || '',
+                    element: product
+                });
+            }
+            
+            // Initially hide all products
+            product.style.display = 'none';
+        });
+
+        // Update suggestion box
+        if (searchTerm && matches.length > 0) {
+            suggestBox.innerHTML = matches.map(match => `
+                <div class="suggestion-item" style="padding: 8px; cursor: pointer; hover: background-color: #f0f0f0;">
+                    ${match.title}
+                </div>
+            `).join('');
+            
+            suggestBox.style.display = 'block';
+
+            // Add click handlers for suggestions
+            suggestBox.querySelectorAll('.suggestion-item').forEach((item, index) => {
+                item.addEventListener('click', () => {
+                    // Show only the clicked product
+                    products.forEach(p => p.style.display = 'none');
+                    matches[index].element.style.display = '';
+                    
+                    // Update search input and hide suggestions
+                    searchInput.value = matches[index].title;
+                    suggestBox.style.display = 'none';
+                    
+                    // Scroll to the product
+                    matches[index].element.scrollIntoView({ behavior: 'smooth' });
+                });
+            });
+        } else {
+            suggestBox.style.display = 'none';
+            // If search is empty, show all products
+            if (!searchTerm) {
+                products.forEach(p => p.style.display = '');
+            }
+        }
+    });
+
+    // Close suggestions when clicking outside
+    document.addEventListener('click', function(e) {
+        if (!e.target.closest('.search-bar')) {
+            suggestBox.style.display = 'none';
+        }
+    });
+}
+
+// Initialize all page functionality
+document.addEventListener('DOMContentLoaded', () => {
+    setupSearch();
+    setupPagination();
 });
 
 // Initialize all functionality
 document.addEventListener('DOMContentLoaded', () => {
-    updateAuthUI();
-    setupUserMenu();
-    setupLogout();
-    updateCartIndicator();
-    setupContactForm();
     handleSearch(); // Initialize search functionality
 });
