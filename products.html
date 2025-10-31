@@ -151,7 +151,7 @@
     try{
       const rawUser = localStorage.getItem('ehw_user') || localStorage.getItem('currentUser') || localStorage.getItem('user');
       if(!rawUser){
-        try{ if(window.showToast) showToast('Please login or register to add items to cart'); else alert('Please login or register to add items to cart'); }catch(e){ alert('Please login or register to add items to cart'); }
+        try{ if(typeof showToast1 === 'function') showToast1('Please login or register to add items to cart'); else if(window.showToast) showToast('Please login or register to add items to cart'); else alert('Please login or register to add items to cart'); }catch(e){ alert('Please login or register to add items to cart'); }
         return;
       }
     }catch(e){ try{ alert('Please login or register to add items to cart'); }catch(_){} return; }
@@ -162,7 +162,7 @@
     const id = `product-${product.id}`;
     if(cart[id]){
       // Already in cart — notify and do not increase quantity
-      try{ if(window.showToast) showToast(product.name + ' is already in your cart'); else alert(product.name + ' is already in your cart'); }catch(e){ try{ alert(product.name + ' is already in your cart'); }catch(_){} }
+  try{ if(typeof showToast3 === 'function') showToast3(product.name + ' is already in your cart'); else if(window.showToast) showToast(product.name + ' is already in your cart'); else alert(product.name + ' is already in your cart'); }catch(e){ try{ alert(product.name + ' is already in your cart'); }catch(_){} }
       try{ const indicator = document.getElementById('cart-indicator'); if(indicator){ const unique = Object.keys(cart).filter(k=> cart[k] && (cart[k].qty || 0) > 0).length || 0; indicator.textContent = unique ? String(unique) : ''; indicator.style.display = unique ? 'inline-block' : 'none'; } }catch(e){}
       return;
     }
@@ -181,7 +181,7 @@
   try{ window.dispatchEvent(new CustomEvent('ehw_cart_updated')); }catch(e){}
     // update header indicator to total qty
   try{ const indicator = document.getElementById('cart-indicator'); if(indicator){ const unique = Object.keys(cart).filter(k=> cart[k] && (cart[k].qty || 0) > 0).length || 0; indicator.textContent = unique ? String(unique) : ''; indicator.style.display = unique ? 'inline-block' : 'none'; } }catch(e){}
-    try{ const msg = `Added ${quantity} ${product.name} to cart`; if(window.showToast) showToast(msg); else alert(msg); }catch(e){ try{ alert(`Added ${quantity} ${product.name} to cart`); }catch(_){} }
+  try{ const msg = `Added ${quantity} ${product.name} to cart`; if(typeof showToast2 === 'function') showToast2(msg); else if(window.showToast) showToast(msg); else alert(msg); }catch(e){ try{ alert(`Added ${quantity} ${product.name} to cart`); }catch(_){} }
   }
 </script>
 

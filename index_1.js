@@ -501,12 +501,12 @@ document.addEventListener('DOMContentLoaded', function(){
     if(menuLogout){
       menuLogout.addEventListener('click', function(e){
         e.preventDefault();
-        try{ localStorage.removeItem('ehw_user'); }catch(err){}
-        try{ localStorage.removeItem('currentUser'); }catch(err){}
-        try{ localStorage.removeItem('user'); }catch(err){}
-        try{ localStorage.removeItem('ehw_user_v1'); }catch(err){}
-        try{ localStorage.removeItem('fullname'); }catch(err){}
-        try{ localStorage.removeItem('name'); }catch(err){}
+  try{ localStorage.removeItem('ehw_user'); }catch(err){}
+  try{ localStorage.removeItem('currentUser'); }catch(err){}
+  try{ localStorage.removeItem('user'); }catch(err){}
+  try{ localStorage.removeItem('ehw_user_v1'); }catch(err){}
+  try{ localStorage.removeItem('fullname'); }catch(err){}
+  try{ localStorage.removeItem('name'); }catch(err){}
         try{ window.dispatchEvent(new StorageEvent('storage',{ key: 'ehw_user', newValue: null })); }catch(e){}
         try{ window.dispatchEvent(new CustomEvent('ehw_cart_updated')); }catch(e){}
         try{ document.querySelectorAll('#cart-indicator, .cart-indicator').forEach(el=>{ if(el){ el.textContent=''; el.style.display='none'; } }); }catch(e){}
@@ -590,17 +590,57 @@ document.addEventListener('DOMContentLoaded', function(){
     indicator.style.display = unique ? 'inline-block' : 'none';
   }
 
-  function getToast(){
+  //Please login or register to add items to cart
+  function getToast1(){
     let t = document.getElementById('ehw-toast');
-    if(!t){ t = document.createElement('div'); t.id = 'ehw-toast'; Object.assign(t.style,{ position:'fixed',right:'20px',bottom:'20px',padding:'10px 14px',background:'#111',color:'#fff',borderRadius:'6px',opacity:'0',transition:'opacity 250ms ease-in-out',zIndex:9999 }); document.body.appendChild(t); }
+    if(!t){ t = document.createElement('div'); t.id = 'ehw-toast'; Object.assign(t.style,{ position:'fixed',right:'2px',top:'9%',padding:'10px 14px',background:'#bd2020ff',color:'#fff',borderRadius:'6px',opacity:'0',transition:'opacity 250ms ease-in-out',zIndex:9999 }); document.body.appendChild(t); }
+    return t;
+  }
+  //Added to cart = Green ;
+  function getToast2(){
+    let t = document.getElementById('ehw-toast');
+    if(!t){ t = document.createElement('div'); t.id = 'ehw-toast'; Object.assign(t.style,{ position:'fixed',right:'2px',top:'9%',padding:'10px 14px',background:'#228529ff',color:'#fff',borderRadius:'6px',opacity:'0',transition:'opacity 250ms ease-in-out',zIndex:9999 }); document.body.appendChild(t); }
+    return t;
+  }
+  //Is Already in your cart = orange
+  function getToast3(){
+    let t = document.getElementById('ehw-toast');
+    if(!t){ t = document.createElement('div'); t.id = 'ehw-toast'; Object.assign(t.style,{ position:'fixed',right:'2px',top:'9%',padding:'10px 14px',background:'#cd7a15ff',color:'#fff',borderRadius:'6px',opacity:'0',transition:'opacity 250ms ease-in-out',zIndex:9999 }); document.body.appendChild(t); }
     return t;
   }
 
-  function showToast(text){ const t = getToast(); t.textContent = text; requestAnimationFrame(()=>{ t.style.opacity = '1'; }); clearTimeout(t._hid); t._hid = setTimeout(()=>{ t.style.opacity = '0'; },1500); }
+  function showToast1(text){
+    const t = getToast1();
+    // ensure red background for login prompt
+    try{ t.style.background = '#bd2020ff'; t.style.color = '#fff'; }catch(e){}
+    t.textContent = text;
+    requestAnimationFrame(()=>{ t.style.opacity = '1'; });
+    clearTimeout(t._hid);
+    t._hid = setTimeout(()=>{ t.style.opacity = '0'; },5000);
+  }
+  function showToast2(text){
+    const t = getToast2();
+    // ensure green background for added-to-cart
+    try{ t.style.background = '#228529ff'; t.style.color = '#fff'; }catch(e){}
+    t.textContent = text;
+    requestAnimationFrame(()=>{ t.style.opacity = '1'; });
+    clearTimeout(t._hid);
+    t._hid = setTimeout(()=>{ t.style.opacity = '0'; },5000);
+  }
+  function showToast3(text){
+    const t = getToast3();
+    // ensure orange background for duplicate notification
+    try{ t.style.background = '#cd7a15ff'; t.style.color = '#1b1b1b'; }catch(e){}
+    t.textContent = text;
+    requestAnimationFrame(()=>{ t.style.opacity = '1'; });
+    clearTimeout(t._hid);
+    t._hid = setTimeout(()=>{ t.style.opacity = '0'; },5000);
+  }
+
 
   function addItemFromButton(btn){
     if(!isLoggedIn()){
-      try{ if(typeof showToast1 === 'function') { showToast1('Please login or register to add items to cart'); } else if(typeof showToast === 'function') { showToast('Please login or register to add items to cart','error'); } else { alert('Please login or register to add items to cart'); } }catch(e){ try{ alert('Please login or register to add items to cart'); }catch(_){} }
+      showToast1('Please login or register to add items to cart');
       return;
     }
     const card = btn.closest('.product-card'); if(!card) return;
@@ -656,13 +696,13 @@ document.addEventListener('DOMContentLoaded', function(){
       const keyFallback = name + '|' + (priceText || image || Math.random().toString(36).slice(2,6));
       resolvedKey = keyFallback;
       cart[resolvedKey] = { name, image, price: (numericPrice !== null ? numericPrice : priceText), qty: 1 };
-      writeCart(cart); updateIndicator(); try{ if(typeof showToast2 === 'function') showToast2('Added to cart — ' + name); else if(typeof showToast === 'function') showToast('Added to cart — ' + name); else alert('Added to cart — ' + name); }catch(e){ try{ alert('Added to cart — ' + name); }catch(_){} }
+      writeCart(cart); updateIndicator(); showToast2('Added to cart — ' + name);
       return;
     }
 
     if (cart[resolvedKey]){
       // already added -> notify and do not increase quantity
-      try{ if(typeof showToast3 === 'function') showToast3(name + ' is already in your cart'); else if(typeof showToast === 'function') showToast(name + ' is already in your cart'); else alert(name + ' is already in your cart'); }catch(e){ try{ alert(name + ' is already in your cart'); }catch(_){} }
+      showToast3(name + ' is already in your cart');
       try{ updateIndicator(); }catch(e){}
       return;
     }
@@ -676,7 +716,7 @@ document.addEventListener('DOMContentLoaded', function(){
     }
 
     cart[resolvedKey] = { name, image, price: finalPrice, qty: 1 };
-    writeCart(cart); updateIndicator(); try{ if(typeof showToast2 === 'function') showToast2('Added to cart — ' + name); else if(typeof showToast === 'function') showToast('Added to cart — ' + name); else alert('Added to cart — ' + name); }catch(e){ try{ alert('Added to cart — ' + name); }catch(_){} }
+    writeCart(cart); updateIndicator(); showToast2('Added to cart — ' + name);
   }
 
   function findProductInfoFromCard(btn){ const card = btn.closest('.product-card'); if(!card) return null; const img = card.querySelector('img') ? card.querySelector('img').getAttribute('src') : ''; const title = card.querySelector('h3') ? card.querySelector('h3').textContent.trim() : ''; const priceEl = card.querySelector('.price'); const price = priceEl ? priceEl.textContent.trim() : ''; return { id: title + '|' + img, name: title, price, image: img }; }
@@ -689,7 +729,7 @@ document.addEventListener('DOMContentLoaded', function(){
       if(cartLink){
         if(!isLoggedIn()){
           e.preventDefault();
-          try{ if(typeof showToast1 === 'function') showToast1('Please login or register to view your cart'); else if(typeof showToast === 'function') showToast('Please login or register to view your cart','error'); else alert('Please login or register to view your cart'); }catch(e){ try{ alert('Please login or register to view your cart'); }catch(_){} }
+          showToast1('Please login or register to view your cart');
           return;
         }
         // allow default for logged-in users (link will navigate)
@@ -714,7 +754,7 @@ document.addEventListener('DOMContentLoaded', function(){
       if(actionBtn){
         if(!isLoggedIn()){
           e.preventDefault();
-          try{ if(typeof showToast1 === 'function') showToast1('Please login or register to view or buy items'); else if(typeof showToast === 'function') showToast('Please login or register to view or buy items','error'); else alert('Please login or register to view or buy items'); }catch(e){ try{ alert('Please login or register to view or buy items'); }catch(_){} }
+          showToast1('Please login or register to view or buy items');
           return;
         }
         // allow default behaviour for logged-in users (onclick handlers will run)
@@ -2042,7 +2082,7 @@ function addToCart(id) {
 
   if(!_isLoggedIn){
     // prefer the site's toast if available, otherwise fallback to alert
-    try{ if(typeof showToast === 'function') { showToast('Please login or register to add items to cart'); } else { alert('Please login or register to add items to cart'); } }catch(e){ try{ alert('Please login or register to add items to cart'); }catch(_){} }
+    try{ if(typeof showToast === 'function') { showToast('Please login or register to add items to cart', 'error'); } else { alert('Please login or register to add items to cart'); } }catch(e){ try{ alert('Please login or register to add items to cart'); }catch(_){} }
     // optional: redirect to login page after showing message (commented out)
     // window.location.href = 'Login.html';
     return;
@@ -2071,7 +2111,7 @@ function addToCart(id) {
   // ✅ Add or update product (no duplicates)
   if (cart[itemKey]) {
     // already added -> notify and do not increase quantity
-    try{ if(typeof showToast === 'function') showToast(product.name + ' is already in your cart'); else alert(product.name + ' is already in your cart'); }catch(e){ try{ alert(product.name + ' is already in your cart'); }catch(_){} }
+  try{ if(typeof showToast3 === 'function') showToast3(product.name + ' is already in your cart'); else if(typeof showToast === 'function') showToast(product.name + ' is already in your cart'); else alert(product.name + ' is already in your cart'); }catch(e){ try{ alert(product.name + ' is already in your cart'); }catch(_){} }
     try{ updateIndicator(); }catch(e){}
   } else {
     cart[itemKey] = {
@@ -2097,7 +2137,48 @@ function addToCart(id) {
     try{ updateIndicator(); }catch(e){}
 
   // ✅ Optional: simple toast notification (no browser alert)
-  showToast(`${product.name} added to cart`);
+  try{ if(typeof showToast2 === 'function') showToast2(`${product.name} added to cart`); else if(typeof showToast === 'function') showToast(`${product.name} added to cart`); else alert(`${product.name} added to cart`); }catch(e){ try{ alert(`${product.name} added to cart`); }catch(_){} }
+}
+
+// Small, reusable toast system (upper-right). Usage: showToast(message, type)
+// types: 'success' (green), 'error' (red), 'warn' (orange), 'info' (blue/default)
+function showToast(message, type){
+  try{
+    // create container if missing
+    var container = document.querySelector('.ehw-toast-container');
+    if(!container){
+      container = document.createElement('div');
+      container.className = 'ehw-toast-container';
+      container.setAttribute('aria-live','polite');
+      document.body.appendChild(container);
+
+      // basic styles (keeps changes local, non-invasive)
+      var style = document.createElement('style');
+      style.textContent = '\n.ehw-toast-container{position:fixed;top:16px;right:16px;z-index:99999;display:flex;flex-direction:column;gap:10px;align-items:flex-end}\n.ehw-toast{min-width:220px;max-width:360px;padding:10px 14px;border-radius:6px;color:#fff;box-shadow:0 6px 18px rgba(0,0,0,0.12);font-family:Segoe UI, Roboto, Arial, sans-serif;font-size:13px;opacity:0;transform:translateY(-6px) scale(0.98);transition:opacity .18s ease,transform .18s ease}\n.ehw-toast.ehw-show{opacity:1;transform:translateY(0) scale(1)}\n.ehw-toast.ehw-success{background:#27ae60}\n.ehw-toast.ehw-error{background:#e74c3c}\n.ehw-toast.ehw-warn{background:#f39c12;color:#1b1b1b}\n.ehw-toast.ehw-info{background:#2980b9}\n';
+      document.head.appendChild(style);
+    }
+
+    var toast = document.createElement('div');
+    toast.className = 'ehw-toast ehw-' + (type || 'info');
+    toast.textContent = message;
+    container.appendChild(toast);
+
+    // show animation
+    requestAnimationFrame(function(){ toast.classList.add('ehw-show'); });
+
+    // auto remove after timeout
+    var timeout = 3500;
+    if(type === 'error') timeout = 4500;
+    if(type === 'warn') timeout = 3200;
+
+    setTimeout(function(){
+      toast.classList.remove('ehw-show');
+      setTimeout(function(){ try{ toast.remove(); }catch(e){} }, 220);
+    }, timeout);
+  }catch(e){
+    // fallback: alert if toast fails
+    try{ alert(message); }catch(_){ }
+  }
 }
 
 
