@@ -59,7 +59,7 @@
         </button>
         <div id="user-dropdown" class="user-dropdown" role="menu" aria-hidden="true">
           <a href="account.html" id="menu-profile" class="menu-item" role="menuitem" tabindex="-1"><strong>My Account</strong></a>
-          <a href="addtocart.html" id="menu-purchase" class="menu-item" role="menuitem" tabindex="-1"><strong>My Purchase</strong></a>
+          <a href="account.html#purchase-section" id="menu-purchase" class="menu-item" role="menuitem" tabindex="-1"><strong>My Purchase</strong></a>
           <a href="#" id="menu-logout" class="menu-item" role="menuitem" tabindex="-1"><strong>Logout</strong></a>
         </div>
       </div>
@@ -121,15 +121,16 @@
                                 <label>Phone Number</label>
                                 <div class="static-value editable">Add</div>
                             </div>
-                            <div class="form-group radio-group">
+                            <div class="form-group radio-group radio-options">
                                 <label>Gender</label>
                                 <div class="radio-options">
-                                    <input type="radio" id="male" name="gender" value="male">
+                                    
                                     <label for="male">Male</label>
-                                    <input type="radio" id="female" name="gender" value="female" checked>
+                                   <input type="radio" id="male" name="gender" value="male">
                                     <label for="female">Female</label>
-                                    <input type="radio" id="other" name="gender" value="other">
+                                    <input type="radio" id="female" name="gender" value="female" checked>
                                     <label for="other">Other</label>
+                                     <input type="radio" id="other" name="gender" value="other">
                                 </div>
                             </div>
                             <div class="form-group">
@@ -138,6 +139,10 @@
                                     **/**/**2000 <a href="#" class="change-link">Change</a>
                                 </div>
                             </div>
+                             <div class="save-button-column">
+                        <button type="submit" class="save-btn-large">Save</button>
+                       </div>
+                    </div>
                         </div>
 
 
@@ -148,12 +153,10 @@
                             <small>File size: maximum 1 MB</small>
                             <small>File extension: .JPEG, .PNG</small>
                         </div>
-                    </div>
+                       
                 </form>
 
-                <div class="save-button-column">
-                        <button type="submit" class="save-btn-large">Save</button>
-                       </div>
+                
 
 
             </section>
@@ -233,10 +236,6 @@
 
                                     <ul class="location-list active" id="location-region-list" data-list="region" role="presentation">
                                         <li class="location-item" role="option">Mindanao</li>
-                                        <li class="location-item" role="option">Metro Manila</li>
-                                        <li class="location-item" role="option">North Luzon</li>
-                                        <li class="location-item" role="option">South Luzon</li>
-                                        <li class="location-item" role="option">Visayas</li>
                                     </ul>
 
                                     <ul class="location-list" id="location-province-list" data-list="province" role="presentation">
@@ -246,9 +245,7 @@
                                     </ul>
 
                                     <ul class="location-list" id="location-city-list" data-list="city" role="presentation">
-                                        <li class="location-item" role="option">Tagum City</li>
                                         <li class="location-item" role="option">Panabo City</li>
-                                        <li class="location-item" role="option">Samal City</li>
                                         <li class="location-item-empty">Select a Province first.</li>
                                     </ul>
 
@@ -274,7 +271,10 @@
                     </div>
 
                     <div class="form-group-modal map-placeholder">
-                        <button type="button" class="add-location-btn">
+                        <label for="modal-map-embed" class="sr-only">Map embed iframe. Optional</label>
+                        <textarea id="modal-map-embed" placeholder="Paste Google Maps embed iframe here" class="input-filled" rows="3" style="width:100%;"></textarea>
+                        <small>Paste the full &lt;iframe&gt;...&lt;/iframe&gt; embed HTML you copied from Google Maps. </small>
+                        <button type="button" class="add-location-btn" style="margin-top:8px;">
                             <i class="fa fa-plus" aria-hidden="true"></i> Add Location
                         </button>
                     </div>

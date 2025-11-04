@@ -143,8 +143,11 @@ document.addEventListener("DOMContentLoaded", () => {
         // Logout handler
         const menuLogout = document.getElementById('menu-logout');
         if (menuLogout) {
+          // ensure the link points to the login page so users land there after logout
+          try{ menuLogout.setAttribute('href', 'Login.html'); }catch(e){}
           menuLogout.addEventListener('click', function (ev) {
             ev.preventDefault();
+            // clear auth keys
             try{ localStorage.removeItem('ehw_user'); }catch(_){ }
             try{ localStorage.removeItem('currentUser'); }catch(_){ }
             try{ localStorage.removeItem('user'); }catch(_){ }
@@ -157,6 +160,8 @@ document.addEventListener("DOMContentLoaded", () => {
             try{ document.querySelectorAll('#cart-indicator, .cart-indicator').forEach(el=>{ if(el){ el.textContent=''; el.style.display='none'; } }); }catch(e){}
             try{ if(typeof window.updateAuthUI === 'function') window.updateAuthUI(); }catch(e){}
             try{ if(typeof window.updateCartIndicator === 'function') window.updateCartIndicator(); }catch(e){}
+            // navigate to login page
+            try{ window.location.href = 'Login.html'; }catch(e){}
           });
         }
       } catch (err) { /* ignore header wiring errors */ }
@@ -450,4 +455,324 @@ document.addEventListener("DOMContentLoaded", () => {
       btn.classList.add("active");
     });
   });
+
+  /* =====================================================
+     🔹 ADD / REMOVE MAP EMBED (Add Location)
+  ====================================================== */
+  const addLocationBtn = document.querySelector('.add-location-btn');
+  if (addLocationBtn) {
+    const mapPreviewWrapperClass = 'map-embed-wrapper';
+    const mapEmbedInput = document.getElementById('modal-map-embed');
+
+    function extractIframeHtml(val) {
+      if (!val) return null;
+      const trimmed = val.trim();
+      // match the full iframe tag (non-greedy)
+      const match = trimmed.match(/<iframe[\s\S]*?<\/iframe>/i);
+      return match ? match[0] : null;
+    }
+
+    addLocationBtn.addEventListener('click', (e) => {
+      e.preventDefault();
+      const container = addLocationBtn.closest('.map-placeholder');
+      if (!container) return;
+      const existing = container.querySelector('.' + mapPreviewWrapperClass);
+      if (existing) {
+        existing.remove();
+        addLocationBtn.innerHTML = '<i class="fa fa-plus" aria-hidden="true"></i> Add Location';
+        return;
+      }
+
+      const raw = mapEmbedInput?.value || '';
+      const iframeHtml = extractIframeHtml(raw);
+      if (!iframeHtml) {
+        const note = document.createElement('div');
+        note.className = 'map-embed-wrapper map-note';
+        note.style.marginTop = '8px';
+        note.textContent = 'Please paste a valid <iframe> embed HTML in the box above, then click Add Location to preview.';
+        container.appendChild(note);
+        setTimeout(() => note.remove(), 3000);
+        return;
+      }
+
+      const previewHtml = `<div class="${mapPreviewWrapperClass}" style="margin-top:8px;">${iframeHtml}</div>`;
+      container.insertAdjacentHTML('beforeend', previewHtml);
+      addLocationBtn.innerHTML = '<i class="fa fa-times" aria-hidden="true"></i> Remove Location';
+    });
+  }
+
+  /* =====================================================
+     🔹 ADDRESS STORAGE, RENDERING & SUBMIT HANDLER
+  ====================================================== */
+  const addressesKey = 'ehw_addresses';
+  const addressesListContainer = document.querySelector('.addresses-list-container');
+
+  function escapeHtml(str) {
+    return String(str || '').replace(/[&<>\"']/g, function (m) {
+      return ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[m];
+    });
+  }
+
+  // Embed-only mode: we will store iframe HTML (mapEmbed) when present in modal
+
+  function renderAddresses() {
+    const container = addressesListContainer;
+    if (!container) return;
+
+    let addresses = [];
+    try { addresses = localStorage.getItem(addressesKey) ? JSON.parse(localStorage.getItem(addressesKey)) : []; } catch (e) { addresses = []; }
+
+    // clear existing
+    container.innerHTML = '';
+
+    if (!addresses.length) {
+      container.innerHTML = `
+        <div class="no-addresses">
+          <div class="map-icon" aria-hidden="true"><i class="fa fa-map-marker"></i></div>
+          <p>You don't have addresses yet.</p>
+        </div>
+      `;
+      return;
+    }
+
+    const list = document.createElement('div');
+    list.className = 'addresses-list';
+
+    addresses.forEach((a, idx) => {
+      const card = document.createElement('div');
+      card.className = 'address-card';
+      // card layout: left = info/actions, right = map preview container
+      card.innerHTML = `
+      <div class="address-row" style="display:flex;gap:12px;align-items:flex-start;">
+          <div class="address-info" style="flex:1;">
+            <div class="address-card-header">
+              <strong>${escapeHtml(a.fullname)}</strong>
+              ${a.default ? '<span class="default-badge">Default</span>' : ''}
+            </div>
+            <div class="address-lines">
+              <div class="address-line">${escapeHtml(a.region)}</div>
+              <div class="address-line">${escapeHtml(a.street || '')}</div>
+              <div class="address-line">Postal: ${escapeHtml(a.postal || '')}</div>
+              <div class="address-line">Phone: ${escapeHtml(a.phone)}</div>
+              <div class="address-label">${escapeHtml(a.label || '')}</div>
+            </div>
+            <div class="address-actions">
+              <button class="view-map-btn" data-idx="${idx}">${a.mapEmbed ? 'View Map' : 'No Map'}</button>
+              <button class="edit-address-btn" data-idx="${idx}">Edit</button>
+              <button class="delete-address-btn" data-idx="${idx}">Delete</button>
+            </div>
+          </div>
+          <div class="address-map" style="width:320px;display:none;">
+            <!-- map iframe will be inserted here when user clicks View Map -->
+          </div>
+        </div>
+      `;
+      list.appendChild(card);
+    });
+
+    container.appendChild(list);
+
+    // attach delete handlers
+    container.querySelectorAll('.delete-address-btn').forEach(btn => {
+      btn.addEventListener('click', (e) => {
+        const idx = Number(btn.dataset.idx);
+        if (!Number.isFinite(idx)) return;
+        addresses.splice(idx, 1);
+        localStorage.setItem(addressesKey, JSON.stringify(addresses));
+        renderAddresses();
+      });
+    });
+
+    // attach view-map handlers (embed-only)
+    container.querySelectorAll('.view-map-btn').forEach(btn => {
+      btn.addEventListener('click', (e) => {
+        const idx = Number(btn.dataset.idx);
+        if (!Number.isFinite(idx)) return;
+        const card = btn.closest('.address-card');
+        if (!card) return;
+        const mapContainer = card.querySelector('.address-map');
+        const addr = addresses[idx];
+        if (!addr || !addr.mapEmbed) {
+          alert('No map embed saved for this address.');
+          return;
+        }
+
+        // toggle
+        if (mapContainer.innerHTML.trim()) {
+          mapContainer.innerHTML = '';
+          mapContainer.style.display = 'none';
+          btn.textContent = 'View Map';
+          return;
+        }
+
+        // insert saved iframe HTML directly
+        mapContainer.innerHTML = addr.mapEmbed;
+        mapContainer.style.display = 'block';
+        btn.textContent = 'Hide Map';
+      });
+    });
+  }
+
+  // handle new address submit
+  const newAddressForm = document.getElementById('new-address-form');
+  if (newAddressForm) {
+    newAddressForm.addEventListener('submit', (e) => {
+      e.preventDefault();
+
+      const fullname = document.getElementById('modal-fullname')?.value.trim() || '';
+      const phone = document.getElementById('modal-phone')?.value.trim() || '';
+      const region = document.getElementById('modal-region-province')?.value.trim() || '';
+      const postal = document.getElementById('modal-postal-code')?.value.trim() || '';
+      const street = document.getElementById('modal-street-address')?.value.trim() || '';
+      const labelEl = document.querySelector('.label-btn.active');
+      const label = labelEl ? labelEl.textContent.trim() : '';
+      const isDefault = !!document.getElementById('default-address')?.checked;
+
+      if (!fullname) { alert('Please enter full name.'); return; }
+      if (!phone) { alert('Please enter phone number.'); return; }
+      if (!region) { alert('Please choose a region/province/city/barangay.'); return; }
+      if (!postal) { alert('Please enter postal code.'); return; }
+
+      let addressesArr = [];
+      try { addressesArr = localStorage.getItem(addressesKey) ? JSON.parse(localStorage.getItem(addressesKey)) : []; } catch (err) { addressesArr = []; }
+
+      if (isDefault) {
+        addressesArr = addressesArr.map(a => ({ ...a, default: false }));
+      }
+
+      // if user previewed an embed in the modal, capture that iframe HTML
+      let mapEmbedHtml = '';
+      try {
+        const modalIframe = document.querySelector('#address-modal .map-placeholder .map-embed-wrapper iframe');
+        if (modalIframe) mapEmbedHtml = modalIframe.outerHTML;
+      } catch (err) { mapEmbedHtml = ''; }
+
+      addressesArr.push({ fullname, phone, region, postal, street, label, mapEmbed: mapEmbedHtml, default: !!isDefault, createdAt: new Date().toISOString() });
+      localStorage.setItem(addressesKey, JSON.stringify(addressesArr));
+
+      // remove modal preview if present
+      try {
+        const modalMapPlaceholder = document.querySelector('#address-modal .map-placeholder');
+        modalMapPlaceholder?.querySelector('.map-embed-wrapper')?.remove();
+      } catch (err) {}
+
+      // reset form, restore label button state
+      newAddressForm.reset();
+      document.querySelectorAll('.label-btn').forEach(b => b.classList.remove('active'));
+      const firstLabel = document.querySelector('.label-btn');
+      if (firstLabel) firstLabel.classList.add('active');
+
+      // close modal and re-render
+      try { closeModal(); } catch (err) {}
+      renderAddresses();
+      alert('Address added successfully.');
+    });
+  }
+
+  // initial render of addresses saved in localStorage
+  renderAddresses();
 });
+
+
+
+
+
+
+
+
+
+
+// My Purchases tab functionality
+(function(){
+  const PURCHASES_KEY = 'ehw_purchases_v1';
+  function readPurchases(){ try{ return JSON.parse(localStorage.getItem(PURCHASES_KEY)) || []; }catch(e){ return []; } }
+
+  function money(n){ return '₱' + (Number(n)||0).toLocaleString(); }
+
+  function renderPurchases(){
+    const section = document.getElementById('purchase-section');
+    if(!section) return;
+    let list = document.getElementById('purchases-list');
+    const noOrders = section.querySelector('.no-orders');
+    const purchases = readPurchases();
+    if(!list){ list = document.createElement('div'); list.id = 'purchases-list'; list.className = 'purchases-list'; section.appendChild(list); }
+    list.innerHTML = '';
+    if(!purchases || purchases.length === 0){ if(noOrders) noOrders.style.display = ''; list.style.display = 'none'; return; }
+    if(noOrders) noOrders.style.display = 'none'; list.style.display = '';
+
+    purchases.forEach(order => {
+      const card = document.createElement('article');
+      card.className = 'order-card';
+      const created = new Date(order.createdAt).toLocaleString();
+      const itemsHtml = (order.items || []).map(it => `
+        <div class="order-item">
+          <img src="${it.image || 'image/e12.webp'}" alt="${(it.name||'')}" />
+          <div class="meta">
+            <div class="name">${it.name || ''}</div>
+            <div class="qty">Qty: ${it.qty || 1}</div>
+            <div class="price">${money((Number(it.price)||0) * (Number(it.qty)||1))}</div>
+          </div>
+        </div>
+      `).join('');
+
+      card.innerHTML = `
+        <header class="order-head">
+          <div class="oid">Order: ${order.id}</div>
+          <div class="status">${order.status || ''}</div>
+        </header>
+        <div class="order-meta">Placed: ${created} • Items: ${order.itemCount || 0} • Total: ${money(order.total)}</div>
+        <div class="order-items">${itemsHtml}</div>
+      `;
+      list.appendChild(card);
+    });
+  }
+
+  // render on load when user is present
+  document.addEventListener('DOMContentLoaded', function(){ renderPurchases(); });
+  // re-render when purchases updated elsewhere
+  window.addEventListener('ehw_purchases_updated', renderPurchases);
+  window.addEventListener('storage', function(e){ if(e.key === PURCHASES_KEY) renderPurchases(); });
+
+  // ensure opening purchase section triggers render
+  const originalOpenSection = window.openSectionFromHash;
+  // openSectionFromHash exists later; we also attach to hashchange (already present)
+  // so rely on hashchange and manual calls
+})();
+
+/* =====================================================
+   🔹 AUTO-OPEN SECTION BASED ON URL HASH
+===================================================== */
+const openSectionFromHash = () => {
+  const hash = window.location.hash.replace('#', '').toLowerCase();
+  if (!hash) return;
+
+  // Map hash keywords to section IDs
+  const map = {
+    profile: 'profile-section',
+    addresses: 'addresses-section',
+    banks: 'banks-cards-section',
+    purchase: 'purchase-section',
+    notif: 'notif-section'
+  };
+
+  const targetId = map[hash];
+  if (!targetId) return;
+
+  // Hide all other sections
+  document.querySelectorAll('.content-section').forEach(sec => sec.classList.remove('active'));
+
+  // Show target section
+  const target = document.getElementById(targetId);
+  if (target) target.classList.add('active');
+
+  // Update sidebar button highlight
+  document.querySelectorAll('.menu-btn, .submenu-btn').forEach(btn => btn.classList.remove('active'));
+  const matchingBtn = document.querySelector(`[data-section="${targetId}"]`);
+  if (matchingBtn) matchingBtn.classList.add('active');
+};
+
+// Run on load
+openSectionFromHash();
+
+// Run when hash changes (optional)
+window.addEventListener('hashchange', openSectionFromHash);

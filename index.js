@@ -205,7 +205,7 @@ document.addEventListener("DOMContentLoaded", () => {
           <p class="details">${p.description}</p>
           <div class="btn-group">
             <button class="add-cart" data-product-id="${p.id}">Add to Cart</button>
-            <button class="view-details" data-product-id="${p.id}">View Details</button>
+            <button class="view-details" data-product-id="${p.id}">Vi====ew Details</button>
             <button class="buy-now">Buy Now</button>
           </div>
         </div>
@@ -630,7 +630,7 @@ document.addEventListener('DOMContentLoaded', function(){
   function showToast3(text){
     const t = getToast3();
     // ensure orange background for duplicate notification
-    try{ t.style.background = '#cd7a15ff'; t.style.color = '#1b1b1b'; }catch(e){}
+    try{ t.style.background = '#e8561cff'; t.style.color = '#1b1b1b'; }catch(e){}
     t.textContent = text;
     requestAnimationFrame(()=>{ t.style.opacity = '1'; });
     clearTimeout(t._hid);
@@ -777,6 +777,35 @@ document.addEventListener('DOMContentLoaded', function(){
     });
   });
 
+  // delegated quick-buy: if a .buy-now button is clicked and it has no inline onclick,
+  // create a single-item purchase and redirect to purchases page.
+  document.addEventListener('click', function(e){
+    try{
+      const btn = e.target.closest && e.target.closest('.buy-now');
+      if(!btn) return;
+      // if element defines an inline onclick handler, prefer that (avoid double-run)
+      try{ if (btn.hasAttribute && btn.hasAttribute('onclick')) return; }catch(e){ }
+
+      e.preventDefault();
+      if(!isLoggedIn()){
+        if(window.showToast1) return window.showToast1('Please login or register to view or buy items');
+        return alert('Please login or register to view or buy items');
+      }
+
+      const info = findProductInfoFromCard(btn) || { name: 'Item', price: 0, image: '' };
+      // attempt to save purchase immediately
+      try{
+        if (window.savePurchaseFromSingle && typeof window.savePurchaseFromSingle === 'function'){
+          window.savePurchaseFromSingle({ key: info.id || info.name, name: info.name, image: info.image, price: Number(info.price)||0, qty: 1 }, { status: 'To Pay' });
+          if (window.showToast2) window.showToast2('Purchase saved — view it in My Purchase');
+          else alert('Purchase saved — view it in My Purchase');
+          setTimeout(()=>{ window.location.href = 'account.html#purchase'; }, 350);
+          return;
+        }
+      }catch(err){ /* fall through to default behaviour */ }
+    }catch(err){ /* ignore */ }
+  });
+
 })();
 
 // --- Cross-page / same-window cart update helpers ---
@@ -795,6 +824,49 @@ window.addEventListener('storage', function(e){ if(!e.key) return; if(e.key === 
 window.addEventListener('pageshow', function(){ ehw_notify_cart_listeners(); });
 document.addEventListener('visibilitychange', function(){ if(document.visibilityState === 'visible') ehw_notify_cart_listeners(); });
 window.addEventListener('popstate', function(){ ehw_notify_cart_listeners(); });
+
+// -- Purchases helpers (save orders to localStorage)
+(function(){
+  const PURCHASES_KEY = 'ehw_purchases_v1';
+  function readPurchases(){ try{ return JSON.parse(localStorage.getItem(PURCHASES_KEY)) || []; }catch(e){ return []; } }
+  function writePurchases(arr){ try{ localStorage.setItem(PURCHASES_KEY, JSON.stringify(arr)); window.dispatchEvent(new CustomEvent('ehw_purchases_updated')); }catch(e){} }
+  function genOrderId(){ return 'ORD-' + Date.now().toString(36) + '-' + Math.random().toString(36).slice(2,6); }
+
+  // Save a purchase built from an items map or single-item map
+  window.savePurchaseFromItems = function(itemsMap, opts){
+    // itemsMap: { key: { name, image, price, qty } }
+    const purchases = readPurchases();
+    const items = Object.keys(itemsMap).map(k => Object.assign({ key:k }, itemsMap[k]));
+    const subtotal = items.reduce((s,i)=> s + ((Number(i.price)||0) * (Number(i.qty)||0)), 0);
+    const itemCount = items.reduce((s,i)=> s + (Number(i.qty)||0), 0);
+    const shipping = itemCount ? 120 : 0;
+    const total = subtotal + shipping;
+    let user = null;
+    try{ user = JSON.parse(localStorage.getItem('ehw_user')) || null; }catch(e){ user = null; }
+
+    const order = {
+      id: genOrderId(),
+      createdAt: new Date().toISOString(),
+      items, subtotal, shipping, total, itemCount,
+      user: user ? { firstName: user.firstName || user.name || user.email, email: user.email } : null,
+      status: (opts && opts.status) || 'To Pay',
+      meta: opts && opts.meta || {}
+    };
+
+    purchases.unshift(order);
+    writePurchases(purchases);
+    return order;
+  };
+
+  // convenience: save single-item object { key,name,image,price,qty }
+  window.savePurchaseFromSingle = function(singleItem, opts){
+    const map = {};
+    const key = singleItem.key || (singleItem.id ? String(singleItem.id) : (singleItem.name || 'item') + '|' + (singleItem.price||0));
+    map[key] = { name: singleItem.name, image: singleItem.image, price: Number(singleItem.price)||0, qty: Number(singleItem.qty)||1 };
+    return window.savePurchaseFromItems(map, opts);
+  };
+})();
+
 
 // Normalize legacy inline onclicks created by templates: convert
 // addToCart(123) -> data-product-id="123" so delegated handlers work
@@ -889,9 +961,9 @@ window.addEventListener('ehw_cart_updated', ensureHeaderAuthRendered);
 window.addEventListener('storage', function(e){ if(e && e.key === 'ehw_user') ensureHeaderAuthRendered(); });
 
 
-
-
 // Product Page
+
+
 
 
 const products = [

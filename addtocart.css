@@ -206,3 +206,52 @@ h1 {
   background: var(--primary);
   color: #fff;
 }
+
+/* ===============================
+   Cart Item Checkbox Styling
+   =============================== */
+
+.checkbox-area {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-right: 8px;
+}
+
+.cart-checkbox {
+  width: 20px;
+  height: 20px;
+  accent-color: var(--primary); /* modern browsers use this for checkbox color */
+  border-radius: 4px;
+  cursor: pointer;
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+
+.cart-checkbox:hover {
+  transform: scale(1.1);
+  box-shadow: 0 0 0 3px rgba(14, 118, 110, 0.2);
+}
+
+/* Slight repositioning to align image + checkbox */
+.cart-item {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 14px 18px;
+  background: var(--bg);
+  border-radius: var(--radius);
+  margin-bottom: 12px;
+  box-shadow: var(--shadow);
+}
+
+.cart-item img {
+  margin-left: 4px;
+}
+
+/* Optional: visually highlight selected items */
+.cart-checkbox:checked ~ img {
+  outline: 3px solid var(--primary);
+  outline-offset: 2px;
+  border-radius: var(--radius);
+  box-shadow: 0 0 0 3px rgba(14,118,110,0.2);
+}

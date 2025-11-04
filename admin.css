@@ -1,4 +1,67 @@
-/* Admin-specific styles that extend the index.css theme */
+
+/* ===============================
+   Enhanced Light Theme (Teal accents) — Drop-in (keeps all class/id names)
+   - Soft off-white background (not too bright)
+   - Light surfaces, subtle shadows, teal accents
+   - All original classes/IDs preserved for JS compatibility
+=============================== */
+
+/* ----------------------
+   Root variables
+   ---------------------- */
+:root{
+  /* neutrals */
+  --bg-page: #f5f6f7;        /* page background — gentle off-white */
+  --surface: #ffffff;        /* card / surface background */
+  --muted: #9aa3a8;          /* subdued text / placeholder */
+  --text: #1f2a2b;           /* main text — deep slate (not black) */
+
+  /* accent */
+  --accent-start: #0f7b76;   /* teal start */
+  --accent-end: #67c6bd;     /* teal end (soft) */
+  --accent-plain: #0f7b76;
+
+  /* states */
+  --success: #2ea58c;
+  --danger: #e05d5d;
+
+  /* elevation */
+  --shadow-1: 0 4px 10px rgba(26, 36, 36, 0.06);
+  --shadow-2: 0 10px 24px rgba(26, 36, 36, 0.08);
+
+  /* layout */
+  --max-width: 1400px;
+  --radius-lg: 12px;
+  --radius-md: 8px;
+  --radius-sm: 6px;
+
+  /* typography */
+  --font-sans: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+/* ----------------------
+   Base
+   ---------------------- */
+* { box-sizing: border-box; -webkit-font-smoothing:antialiased; -moz-osx-font-smoothing:grayscale; }
+html,body { height:100%; }
+body{
+  margin:0;
+
+  font-family: var(--font-sans);
+  background: var(--bg-page);
+  color: var(--text);
+  line-height:1.5;
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* Accessible focus ring (keyboard only) */
+:focus { outline: none; }
+:focus:not(:focus-visible) { box-shadow: none !important; }
+:is(a,button,input,select,textarea,.user-toggle,.page-link,.add-cart,.view-details,.buy-now):focus-visible{
+  outline: none;
+  box-shadow: 0 0 0 4px rgba(15,123,118,0.12);
+  border-radius: 8px;
+}/* Admin-specific styles that extend the index.css theme */
         body {
             background: var(--bg-page);
             color: var(--text);
