@@ -1,4 +1,3 @@
-
 /* ===============================
    Enhanced Light Theme (Teal accents) — Drop-in (keeps all class/id names)
    - Soft off-white background (not too bright)
@@ -24,6 +23,9 @@
   /* states */
   --success: #2ea58c;
   --danger: #e05d5d;
+  --warning: #f59e0b; /* added warning color for badges */
+  --info: #3b82f6; /* added info color for badges */
+
 
   /* elevation */
   --shadow-1: 0 4px 10px rgba(26, 36, 36, 0.06);
@@ -185,6 +187,29 @@ body{
             text-align: left;
             border-bottom: 1px solid rgba(31, 42, 43, 0.06);
         }
+
+        /* Enhanced Table Styling for Order View */
+        .data-table tr:hover {
+            background-color: rgba(15, 123, 118, 0.02); /* Very light hover */
+        }
+
+        /* Ensure actions column doesn't wrap awkwardly */
+        .data-table .action-cell-wrapper {
+            min-width: 120px;
+            display: flex;
+            gap: 0.5rem;
+            justify-content: flex-end; /* Right align actions if space allows */
+        }
+
+        /* Make table heads stick out more for better visual hierarchy */
+        .data-table thead th {
+            background-color: var(--bg-page);
+            position: sticky;
+            top: 0;
+            z-index: 10;
+        }
+
+
         .data-table th {
             color: var(--muted);
             font-size: 0.75rem;
@@ -199,10 +224,15 @@ body{
             font-weight: 600;
             line-height: 1;
         }
+        /* Adjusted badge colors based on new root variables */
         .badge-topay { background-color: #fef3c7; color: var(--warning); }
         .badge-toship { background-color: #e0f2fe; color: var(--info); }
-        .badge-toreceive { background-color: #f3e8ff; color: var(--accent-plain); }
+        .badge-toreceive { background-color: #f3e8ff; color: #9333ea; } /* Changed to use purple shade */
         .badge-completed { background-color: #d1fae5; color: var(--success); }
+        .badge-cancelled { background-color: #fee2e2; color: var(--danger); }
+        .badge-refunded { background-color: #d1fae5; color: var(--success); }
+        .badge-returned { background-color: #fce7f3; color: #db2777; }
+
 
         /* Report List Styles */
         .report-list-item {
@@ -372,6 +402,7 @@ body{
         .modal-content button:hover {
             transform: translateY(-1px);
             box-shadow: var(--shadow-2);
+            filter: brightness(1.1);
         }
         @keyframes slideIn {
             from { opacity: 0; transform: translateY(-20px); }
@@ -399,6 +430,11 @@ body{
             background: rgba(224, 93, 93, 0.1);
         }
 
+        .action-btn[data-action^="process-"] {
+             color: #fff;
+             background: var(--accent-plain);
+        }
+
         .action-btn:hover {
             transform: translateY(-1px);
             filter: brightness(1.1);
@@ -422,10 +458,26 @@ body{
             font-weight: 600;
         }
 
+        .status-btn {
+            padding: 10px 20px;
+            border-radius: var(--radius-md);
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            border: none;
+            box-shadow: var(--shadow-1);
+        }
+        .status-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-2);
+            filter: brightness(1.1);
+        }
+
+
 /* ----------------------
    Button Styles
    ---------------------- */
-   
+
 button,
 .btn {
   display: inline-block;

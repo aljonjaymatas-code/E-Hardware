@@ -6,6 +6,7 @@
     <title>JS-Enabled Admin Dashboard</title>
     <link rel="stylesheet" href="admin.css">
     <script src="admin.js" defer></script>
+
 </head>
 <body>
     <div class="app-container">
@@ -30,17 +31,6 @@
                     <svg viewBox="0 0 24 24"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
                     <span>Transactions</span>
                 </div>
-                <!-- New Reports Navigation Item -->
-                <div data-view="reports" class="nav-item">
-                    <svg viewBox="0 0 24 24">
-                        <line x1="12" y1="20" x2="12" y2="10"/>
-                        <line x1="18" y1="20" x2="18" y2="4"/>
-                        <line x1="6" y1="20" x2="6" y2="16"/>
-                        <line x1="2" y1="20" x2="22" y2="20"/>
-                    </svg>
-                    <span>Reports</span>
-                </div>
-                <!-- End New Reports Navigation Item -->
             </nav>
 
             <!-- User ID Display -->
@@ -64,7 +54,7 @@
             <!-- Dashboard View -->
             <div id="view-dashboard" data-view-id="dashboard" class="page-view active">
                 <h1 style="font-size: 2rem; font-weight: 800; margin-bottom: 1.5rem; color: var(--text);">Dashboard Overview</h1>
-                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 1.5rem;">
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 1.5rem; margin-bottom: 2rem;">
                     <div class="card" style="padding: 1rem;">
                         <p style="font-size: 0.875rem; color: var(--muted);">Total Revenue</p>
                         <h2 style="font-size: 1.875rem; font-weight: 800; margin-top: 0.25rem; color: var(--success);">₱0,000</h2>
@@ -82,6 +72,29 @@
                         <h2 style="font-size: 1.875rem; font-weight: 800; margin-top: 0.25rem; color: var(--accent-plain);">0</h2>
                     </div>
                 </div>
+
+                <!-- REPORTS CONTENT MOVED FROM #view-reports -->
+                <h2 style="font-size: 1.5rem; font-weight: 700; margin-bottom: 1.5rem; color: var(--text);">Business Reports</h2>
+                <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+
+                    <!-- Top Selling Items Report Card (JS injection point) -->
+                    <div class="card p-6 border-green-500 border-l-4" style="border-left: 4px solid var(--success);">
+                        <p class="text-lg font-medium mb-4" style="color: var(--success); font-weight: 600;">Top Selling Items (Last 30 Days)</p>
+                        <div id="top-selling-list" class="space-y-1">
+                            <!-- Content injected by JavaScript -->
+                        </div>
+                    </div>
+
+                    <!-- Slow Movers/Low Selling Report Card (JS injection point) -->
+                    <div class="card p-6 border-red-500 border-l-4" style="border-left: 4px solid var(--danger);">
+                        <p class="text-lg font-medium mb-4" style="color: var(--danger); font-weight: 600;">Slow Movers (Last 90 Days)</p>
+                        <div id="slow-movers-list" class="space-y-1">
+                            <!-- Content injected by JavaScript -->
+                        </div>
+                    </div>
+
+                </div>
+                <!-- END REPORTS CONTENT -->
             </div>
 
             <!-- Inventory View: Now uses an inline form for adding items and includes edit/remove buttons -->
@@ -143,39 +156,39 @@
                                 <tr data-item-id="prod-a">
                                     <td>Product A</td>
                                     <td>Electronics</td>
-                                    <td class="text-green-400 font-semibold">₱100.00</td>
+                                    <td class="price-cell">₱100.00</td>
                                     <td><span class="badge badge-completed">50</span></td>
                                     <td>15</td>
                                     <td>
-                                        <div class="flex space-x-3">
-                                            <button data-action="edit" class="action-btn text-yellow-500 hover:text-yellow-400 text-sm font-medium">Edit</button>
-                                            <button data-action="remove" class="action-btn text-red-500 hover:text-red-400 text-sm font-medium">Remove</button>
+                                        <div style="display: flex; gap: 0.75rem;">
+                                            <button data-action="edit" class="action-btn">Edit</button>
+                                            <button data-action="remove" class="action-btn">Remove</button>
                                         </div>
                                     </td>
                                 </tr>
                                 <tr data-item-id="prod-b">
                                     <td>Product B</td>
                                     <td>Apparel</td>
-                                    <td class="text-green-400 font-semibold">₱500.00</td>
+                                    <td class="price-cell">₱500.00</td>
                                     <td><span class="badge badge-topay">10</span></td>
                                     <td>20</td>
                                     <td>
-                                        <div class="flex space-x-3">
-                                            <button data-action="edit" class="action-btn text-yellow-500 hover:text-yellow-400 text-sm font-medium">Edit</button>
-                                            <button data-action="remove" class="action-btn text-red-500 hover:text-red-400 text-sm font-medium">Remove</button>
+                                        <div style="display: flex; gap: 0.75rem;">
+                                            <button data-action="edit" class="action-btn">Edit</button>
+                                            <button data-action="remove" class="action-btn">Remove</button>
                                         </div>
                                     </td>
                                 </tr>
                                 <tr data-item-id="prod-c">
                                     <td>Product C</td>
                                     <td>Food & Beverage</td>
-                                    <td class="text-green-400 font-semibold">₱2,000.00</td>
+                                    <td class="price-cell">₱2,000.00</td>
                                     <td><span class="badge badge-completed">25</span></td>
                                     <td>5</td>
                                     <td>
-                                        <div class="flex space-x-3">
-                                            <button data-action="edit" class="action-btn text-yellow-500 hover:text-yellow-400 text-sm font-medium">Edit</button>
-                                            <button data-action="remove" class="action-btn text-red-500 hover:text-red-400 text-sm font-medium">Remove</button>
+                                        <div style="display: flex; gap: 0.75rem;">
+                                            <button data-action="edit" class="action-btn">Edit</button>
+                                            <button data-action="remove" class="action-btn">Remove</button>
                                         </div>
                                     </td>
                                 </tr>
@@ -192,7 +205,7 @@
                 <div id="order-tabs" class="flex overflow-x-auto pb-2 gap-2">
                     <button class="tab-button active" data-tab="topay">To Pay (0)</button>
                     <button class="tab-button" data-tab="toship">To Ship (0)</button>
-                    <button class="tab-button" data-tab="toreceive">To Receive (0)</button>
+                    <button class="tab-button" data-tab="toreceive">To Receive (0)</button> <!-- RE-ADDED -->
                     <button class="tab-button" data-tab="completed">Completed (0)</button>
                     <!-- New Order Lifecycle Tabs -->
                     <button class="tab-button" data-tab="cancelled">Cancelled (0)</button>
@@ -208,12 +221,12 @@
                         <div class="overflow-x-auto">
                             <table class="data-table">
                                 <thead>
-                                    <!-- Order ID removed -->
-                                    <tr><th>Customer</th><th>Amount</th><th>Date</th><th>Status</th></tr>
+                                    <!-- Quantity added -->
+                                    <tr><th>Order ID</th><th>Customer</th><th>Amount</th><th>Quantity</th><th>Date</th><th>Status</th><th>Actions</th></tr>
                                 </thead>
-                                <tbody>
-                                    <!-- colspan reduced from 5 to 4 -->
-                                    <tr><td colspan="4" class="text-center text-gray-500 py-4">No orders awaiting payment.</td></tr>
+                                <tbody id="orders-topay-body">
+                                    <!-- initial empty state rendered by JS if no orders -->
+                                    <tr><td colspan="7" class="text-center text-gray-500 py-4">No orders awaiting payment.</td></tr>
                                 </tbody>
                             </table>
                         </div>
@@ -225,46 +238,43 @@
                         <div class="overflow-x-auto">
                             <table class="data-table">
                                 <thead>
-                                    <!-- Order ID removed -->
-                                    <tr><th>Customer</th><th>Amount</th><th>Date</th><th>Action</th></tr>
+                                    <!-- Quantity added -->
+                                    <tr><th>Order ID</th><th>Customer</th><th>Amount</th><th>Quantity</th><th>Date</th><th>Actions</th></tr>
                                 </thead>
-                                <tbody>
-                                    <!-- colspan reduced from 5 to 4 -->
-                                    <tr><td colspan="4" class="text-center text-gray-500 py-4">No orders to ship.</td></tr>
+                                <tbody id="orders-toship-body">
+                                    <tr><td colspan="6" class="text-center text-gray-500 py-4">No orders to ship.</td></tr>
                                 </tbody>
                             </table>
                         </div>
                     </div>
 
-                    <!-- To Receive Pane -->
+                    <!-- To Receive Pane (RE-ADDED) -->
                     <div id="pane-toreceive" data-tab-pane="toreceive" class="card tab-pane-content" style="display: none;">
-                        <h3 class="text-xl font-semibold mb-4 text-purple-500">In Transit</h3>
+
                         <div class="overflow-x-auto">
                             <table class="data-table">
                                 <thead>
-                                    <!-- Order ID removed -->
-                                    <tr><th>Customer</th><th>Tracking</th><th>Expected</th><th>Status</th></tr>
+                                    <!-- Actions column removed -->
+                                    <tr><th>Order ID</th><th>Customer</th><th>Amount</th><th>Quantity</th><th>Date</th><th>Status</th></tr>
                                 </thead>
-                                <tbody>
-                                    <!-- colspan reduced from 5 to 4 -->
-                                    <tr><td colspan="4" class="text-center text-gray-500 py-4">No active transit orders.</td></tr>
+                                <tbody id="orders-toreceive-body">
+                                    <tr><td colspan="6" class="text-center text-gray-500 py-4">No orders currently in transit.</td></tr>
                                 </tbody>
-                            </table >
+                            </table>
                         </div>
                     </div>
 
                     <!-- Completed Pane -->
                     <div id="pane-completed" data-tab-pane="completed" class="card tab-pane-content" style="display: none;">
-                        <h3 class="text-xl font-semibold mb-4 text-green-500">Fulfilled Orders</h3>
+                        <h3 class="text-xl font-semibold mb-4 text-green-500">Fulfilled Orders (Customer Received)</h3>
                         <div class="overflow-x-auto">
                             <table class="data-table">
                                 <thead>
-                                    <!-- Order ID removed -->
-                                    <tr><th>Customer</th><th>Amount</th><th>Date</th><th>Status</th></tr>
+                                    <!-- Quantity added -->
+                                    <tr><th>Order ID</th><th>Customer</th><th>Amount</th><th>Quantity</th><th>Date</th><th>Status</th></tr>
                                 </thead>
-                                <tbody>
-                                    <!-- colspan reduced from 5 to 4 -->
-                                    <tr><td colspan="4" class="text-center text-gray-500 py-4">No recently completed orders.</td></tr>
+                                <tbody id="orders-completed-body">
+                                    <tr><td colspan="6" class="text-center text-gray-500 py-4">No recently completed orders.</td></tr>
                                 </tbody>
                             </table>
                         </div>
@@ -276,9 +286,10 @@
                         <div class="overflow-x-auto">
                             <table class="data-table">
                                 <thead>
-                                    <tr><th>Customer</th><th>Amount</th><th>Cancellation Date</th><th>Reason</th></tr>
+                                    <!-- Updated headers -->
+                                    <tr><th>Order ID</th><th>Customer</th><th>Amount</th><th>Cancellation Date</th></tr>
                                 </thead>
-                                <tbody>
+                                <tbody id="orders-cancelled-body">
                                     <tr><td colspan="4" class="text-center text-gray-500 py-4">No cancelled orders found.</td></tr>
                                 </tbody>
                             </table>
@@ -291,9 +302,10 @@
                         <div class="overflow-x-auto">
                             <table class="data-table">
                                 <thead>
-                                    <tr><th>Customer</th><th>Amount</th><th>Return Date</th><th>Details</th></tr>
+                                    <!-- Updated headers -->
+                                    <tr><th>Order ID</th><th>Customer</th><th>Amount</th><th>Return Date</th></tr>
                                 </thead>
-                                <tbody>
+                                <tbody id="orders-returned-body">
                                     <tr><td colspan="4" class="text-center text-gray-500 py-4">No items awaiting return processing.</td></tr>
                                 </tbody>
                             </table>
@@ -306,9 +318,10 @@
                         <div class="overflow-x-auto">
                             <table class="data-table">
                                 <thead>
-                                    <tr><th>Customer</th><th>Amount</th><th>Refund Date</th><th>Status</th></tr>
+                                    <!-- Updated headers -->
+                                    <tr><th>Order ID</th><th>Customer</th><th>Amount</th><th>Refund Date</th></tr>
                                 </thead>
-                                <tbody>
+                                <tbody id="orders-refunded-body">
                                     <tr><td colspan="4" class="text-center text-gray-500 py-4">No recent refunds issued.</td></tr>
                                 </tbody>
                             </table>
@@ -338,31 +351,7 @@
                     </div>
                 </div>
             </div>
-
-            <!-- Reports View (UPDATED: Only Top Selling and Slow Movers remain) -->
-            <div id="view-reports" data-view-id="reports" class="page-view">
-                <h1 class="text-3xl font-bold mb-6">Business Reports</h1>
-                <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-
-                    <!-- Top Selling Items Report Card (JS injection point) -->
-                    <div class="card p-6 border-green-500 border-l-4">
-                        <p class="text-lg font-medium text-green-400 mb-4">Top Selling Items (Last 30 Days)</p>
-                        <div id="top-selling-list" class="space-y-1">
-                            <!-- Content injected by JavaScript -->
-                        </div>
-                    </div>
-
-                    <!-- Slow Movers/Low Selling Report Card (JS injection point) -->
-                    <div class="card p-6 border-red-500 border-l-4">
-                        <p class="text-lg font-medium text-red-400 mb-4">Slow Movers (Last 90 Days)</p>
-                        <div id="slow-movers-list" class="space-y-1">
-                            <!-- Content injected by JavaScript -->
-                        </div>
-                    </div>
-
-                </div>
-            </div>
-            <!-- End Reports View -->
+            <!-- Reports View was removed from here -->
 
             <!-- 3. EDIT INVENTORY MODAL (Hidden by default) -->
             <div id="edit-modal" class="modal-overlay hidden">
@@ -407,7 +396,28 @@
                     </form>
                 </div>
             </div>
-            <!-- END MODAL -->
+            <!-- END EDIT MODAL -->
+
+
+            <!-- 4. ORDER PROCESS MODAL (Hidden by default) -->
+            <div id="order-process-modal" class="modal-overlay hidden">
+                <div class="modal-content">
+                    <h3 style="font-size: 1.5rem; font-weight: 800; margin-bottom: 1.5rem; color: var(--accent-plain);">Process Order #<span id="process-order-id"></span></h3>
+                    <p style="margin-bottom: 1.5rem; color: var(--muted);" id="process-order-prompt">Select the next status for this order:</p>
+
+                    <!-- Dynamic buttons will be injected here -->
+                    <div id="process-modal-buttons" style="display: flex; flex-direction: column; gap: 0.75rem;">
+                        <!-- Buttons dynamically generated by JS based on current order status -->
+                    </div>
+
+                    <!-- Add a close button -->
+                    <button type="button" onclick="closeOrderProcessModal()" style="margin-top: 1rem; background-color: var(--bg-page); color: var(--text); border: 1px solid var(--muted);">
+                        Close
+                    </button>
+                </div>
+            </div>
+            <!-- END ORDER PROCESS MODAL -->
+
 
         </main>
     </div>
